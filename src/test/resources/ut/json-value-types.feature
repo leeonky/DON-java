@@ -23,3 +23,17 @@ Feature: support json value: boolean string null number
     """
     = null
     """
+
+  Scenario Outline: numbers
+    Given the following code:
+    """
+    <input>
+    """
+    Then got the following data:
+    """
+    = <result> and class.simpleName: '<type>'
+    """
+    Examples:
+      | input | type    | result |
+      | 1     | Integer | 1      |
+

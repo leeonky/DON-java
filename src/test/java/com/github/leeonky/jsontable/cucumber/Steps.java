@@ -1,31 +1,39 @@
 package com.github.leeonky.jsontable.cucumber;
 
+import com.github.leeonky.jsontable.Numbers;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 
 import static com.github.leeonky.dal.extension.assertj.DALAssert.expect;
 
 public class Steps {
-    private String json;
-    private JsonTableParser jsonTableParser = new JsonTableParser();
+    private String inputCode;
+    private final JsonTableParser jsonTableParser = new JsonTableParser();
 
     @Given("the following code:")
     public void the_following_code(String json) {
-        this.json = json;
+        inputCode = json;
     }
 
     @Then("got the following data:")
     public void got_the_following_data(String assertion) {
-        expect(jsonTableParser.parse(json)).should(assertion);
+        expect(jsonTableParser.parse(inputCode)).should(assertion);
+    }
+
+    @Then("got the following number:")
+    public void got_the_following_number(String assertion) {
+        expect(Numbers.parseNumber(inputCode)).should(assertion);
     }
 
     public static class JsonTableParser {
-        public Object parse(CharSequence content) {
+        public Object parse(String content) {
             if (content.equals("null"))
                 return null;
             if (content.equals("true"))
                 return true;
-            return false;
+            if (content.equals("false"))
+                return false;
+            return Numbers.parseNumber(content);
         }
     }
 }
