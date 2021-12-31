@@ -1,5 +1,7 @@
 package com.github.leeonky.jsontable;
 
+import java.util.Iterator;
+
 public class Numbers {
 
     public static Number parseNumber(String content) {
@@ -32,8 +34,9 @@ public class Numbers {
             if (isTheEnd())
                 return null;
             int value = 0;
-            while (index < chars.length) {
-                char c = chars[index++];
+            int limit = negative > 0 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
+            int limitBeforeMul = limit / 10;
+            for (char c : leftChars()) {
                 if (c == '_') {
                     if (isTheEnd())
                         return null;
@@ -42,9 +45,15 @@ public class Numbers {
                 int digit = Character.digit(c, 10);
                 if (digit < 0)
                     return null;
-                value = value * 10 + digit;
+                if (value < limitBeforeMul || value * 10 < limit + digit)
+                    return parseLong(negative, ((long) value * 10) - digit);
+                value = value * 10 - digit;
             }
-            return negative * value;
+            return -negative * value;
+        }
+
+        private long parseLong(int negative, long base) {
+            return -negative * base;
         }
 
         private boolean isTheEnd() {
@@ -56,6 +65,21 @@ public class Numbers {
                 return -1;
             takeChar('+');
             return 1;
+        }
+
+        private Iterable<Character> leftChars() {
+            return () -> new Iterator<Character>() {
+
+                @Override
+                public boolean hasNext() {
+                    return !isTheEnd();
+                }
+
+                @Override
+                public Character next() {
+                    return chars[index++];
+                }
+            };
         }
     }
 }
