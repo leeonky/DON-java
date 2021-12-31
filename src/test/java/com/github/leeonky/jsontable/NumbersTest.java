@@ -12,6 +12,7 @@ class NumbersTest {
         assertParse("0", 0);
         assertParse("1", 1);
         assertParse("24", 24);
+        assertParse("1_000", 1_000);
         assertParse("+24", 24);
     }
 
@@ -22,6 +23,9 @@ class NumbersTest {
 
     @Test
     void invalid_number() {
+        assertParse("+", null);
+        assertParse("-", null);
+        assertParse("1_", null);
         assertParse("", null);
         assertParse("notNumber", null);
     }

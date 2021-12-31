@@ -10,11 +10,7 @@ public class Numbers {
         if (content.length() == 0)
             return null;
         Token token = new Token(content);
-        int negative = token.getSign();
-        Integer value = token.getInteger();
-        if (value == null)
-            return null;
-        return negative * value;
+        return token.getInteger(token.getSign());
     }
 
     private static class Token {
@@ -32,15 +28,27 @@ public class Numbers {
             return result;
         }
 
-        public Integer getInteger() {
+        public Number getInteger(int negative) {
+            if (isTheEnd())
+                return null;
             int value = 0;
             while (index < chars.length) {
-                int digit = Character.digit(chars[index++], 10);
+                char c = chars[index++];
+                if (c == '_') {
+                    if (isTheEnd())
+                        return null;
+                    continue;
+                }
+                int digit = Character.digit(c, 10);
                 if (digit < 0)
                     return null;
                 value = value * 10 + digit;
             }
-            return value;
+            return negative * value;
+        }
+
+        private boolean isTheEnd() {
+            return index == chars.length;
         }
 
         public int getSign() {
