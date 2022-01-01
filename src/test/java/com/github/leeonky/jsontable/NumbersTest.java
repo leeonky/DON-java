@@ -169,18 +169,33 @@ class NumbersTest {
                 assertParse("-1000000000000000_00_05", new BigInteger("-10000000000000000005"));
             }
 
-            //                            @Test
-//                void over_flow() {
-//                    assertParse("9223372036854775808", new BigInteger("9223372036854775808"));
-//                    assertParse("9223372036854775811", new BigInteger("9223372036854775811"));
-//                    assertParse("-9223372036854775809", new BigInteger("-9223372036854775809"));
-//                    assertParse("-9223372036854775811", new BigInteger("-9223372036854775811"));
-//                }
-//
             @Test
             void invalid_number() {
                 assertParse("10000000000000000005_", null);
                 assertParse("10000000000000000005xx", null);
+            }
+        }
+
+        @Nested
+        class Radix16 {
+
+            @Test
+            void parse_big_int() {
+                assertParse("0x80000000000000001", new BigInteger("80000000000000001", 16));
+                assertParse("0x800000000000000012", new BigInteger("800000000000000012", 16));
+                assertParse("0x800000000000_000_012", new BigInteger("800000000000000012", 16));
+            }
+
+            @Test
+            void negative() {
+                assertParse("-0x10000000000000000005", new BigInteger("-10000000000000000005", 16));
+                assertParse("-0x1000000000000000_00_05", new BigInteger("-10000000000000000005", 16));
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("0x10000000000000000005_", null);
+                assertParse("0x10000000000000000005xx", null);
             }
         }
     }
