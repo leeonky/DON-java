@@ -28,11 +28,33 @@ class NumbersTest {
         }
 
         @Test
-        void out_of_int() {
+        void int_over_flow() {
             assertParse("2147483657", 2147483657L);
             assertParse("2147483648", 2147483648L);
             assertParse("-2147483649", -2147483649L);
             assertParse("-2147483658", -2147483658L);
+        }
+
+        @Test
+        void invalid_number() {
+            assertParse("+", null);
+            assertParse("-", null);
+            assertParse("1_", null);
+        }
+    }
+
+    @Nested
+    class ParseLong {
+
+        @Test
+        void parse_long() {
+            assertParse("100000000005", 100000000005L);
+            assertParse("100000000005_000", 100000000005_000L);
+        }
+
+        @Test
+        void invalid_number() {
+            assertParse("100000000005_", null);
         }
     }
 
