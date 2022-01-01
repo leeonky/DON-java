@@ -1,5 +1,6 @@
 package com.github.leeonky.jsontable;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 
 public class Numbers {
@@ -66,6 +67,22 @@ public class Numbers {
             }
         }
 
+        public static class LongBoundary {
+            private final long limit;
+            private final long limitBeforeMul;
+            private final int radix;
+
+            public LongBoundary(int negative, int radix) {
+                limit = negative > 0 ? -Long.MAX_VALUE : Long.MIN_VALUE;
+                limitBeforeMul = limit / radix;
+                this.radix = radix;
+            }
+
+            private boolean isOverflow(long value, int digit) {
+                return value < limitBeforeMul || value * radix < limit + digit;
+            }
+        }
+
         public Number parseInteger(int negative, int radix) {
             if (isTheEnd())
                 return null;
@@ -88,6 +105,7 @@ public class Numbers {
         }
 
         private Number parseLong(long value, int negative, int radix) {
+            LongBoundary longBoundary = new LongBoundary(negative, radix);
             for (char c : leftChars()) {
                 if (c == '_') {
                     if (isTheEnd())
@@ -97,9 +115,29 @@ public class Numbers {
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
+                if (longBoundary.isOverflow(value, digit)) {
+                    return parseBigInteger(BigInteger.valueOf(value).multiply(BigInteger.valueOf(radix))
+                            .subtract(BigInteger.valueOf(digit)), negative, radix);
+                }
                 value = value * radix - digit;
             }
             return -negative * value;
+        }
+
+        private Number parseBigInteger(BigInteger value, int negative, int radix) {
+            BigInteger radixBigInteger = BigInteger.valueOf(radix);
+            for (char c : leftChars()) {
+                if (c == '_') {
+                    if (isTheEnd())
+                        return null;
+                    continue;
+                }
+                int digit = Character.digit(c, radix);
+                if (digit < 0)
+                    return null;
+                value = value.multiply(radixBigInteger).subtract(BigInteger.valueOf(digit));
+            }
+            return negative > 0 ? value.negate() : value;
         }
 
         private boolean isTheEnd() {
