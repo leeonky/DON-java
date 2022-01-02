@@ -6,10 +6,6 @@ import java.util.Iterator;
 public class Numbers {
 
     public static Number parseNumber(String content) {
-        return new Numbers().parse(content);
-    }
-
-    private Number parse(String content) {
         if (content.length() == 0)
             return null;
         Token token = new Token(content);
@@ -56,8 +52,8 @@ public class Numbers {
             private final int limitBeforeMul;
             private final int radix;
 
-            public IntegerBoundary(int negative, int radix) {
-                limit = negative > 0 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
+            public IntegerBoundary(int sign, int radix) {
+                limit = sign > 0 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
                 limitBeforeMul = limit / radix;
                 this.radix = radix;
             }
@@ -72,8 +68,8 @@ public class Numbers {
             private final long limitBeforeMul;
             private final int radix;
 
-            public LongBoundary(int negative, int radix) {
-                limit = negative > 0 ? -Long.MAX_VALUE : Long.MIN_VALUE;
+            public LongBoundary(int sign, int radix) {
+                limit = sign > 0 ? -Long.MAX_VALUE : Long.MIN_VALUE;
                 limitBeforeMul = limit / radix;
                 this.radix = radix;
             }
@@ -83,29 +79,45 @@ public class Numbers {
             }
         }
 
-        public Number parseInteger(int negative, int radix) {
+        public Number parseInteger(int sign, int radix) {
             if (isTheEnd())
                 return null;
             int value = 0;
-            IntegerBoundary integerBoundary = new IntegerBoundary(negative, radix);
+            IntegerBoundary integerBoundary = new IntegerBoundary(sign, radix);
             for (char c : leftChars()) {
                 if (c == '_') {
                     if (isTheEnd())
                         return null;
                     continue;
                 }
+                if (c == '.') {
+                    return parseDoubleWithDot(value, sign);
+                }
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
                 if (integerBoundary.isOverflow(value, digit))
-                    return parseLong(((long) value * radix) - digit, negative, radix);
+                    return parseLong(((long) value * radix) - digit, sign, radix);
                 value = value * radix - digit;
             }
-            return -negative * value;
+            return -sign * value;
         }
 
-        private Number parseLong(long value, int negative, int radix) {
-            LongBoundary longBoundary = new LongBoundary(negative, radix);
+        private Number parseDoubleWithDot(int integer, int sign) {
+            StringBuilder stringBuilder = new StringBuilder(chars.length);
+            stringBuilder.append(integer);
+            stringBuilder.append('.');
+            for (char c : leftChars()) {
+                if (c == '_') {
+                    continue;
+                }
+                stringBuilder.append(c);
+            }
+            return -sign * Double.parseDouble(stringBuilder.toString());
+        }
+
+        private Number parseLong(long value, int sign, int radix) {
+            LongBoundary longBoundary = new LongBoundary(sign, radix);
             for (char c : leftChars()) {
                 if (c == '_') {
                     if (isTheEnd())
@@ -117,14 +129,14 @@ public class Numbers {
                     return null;
                 if (longBoundary.isOverflow(value, digit)) {
                     return parseBigInteger(BigInteger.valueOf(value).multiply(BigInteger.valueOf(radix))
-                            .subtract(BigInteger.valueOf(digit)), negative, radix);
+                            .subtract(BigInteger.valueOf(digit)), sign, radix);
                 }
                 value = value * radix - digit;
             }
-            return -negative * value;
+            return -sign * value;
         }
 
-        private Number parseBigInteger(BigInteger value, int negative, int radix) {
+        private Number parseBigInteger(BigInteger value, int sign, int radix) {
             BigInteger radixBigInteger = BigInteger.valueOf(radix);
             for (char c : leftChars()) {
                 if (c == '_') {
@@ -137,7 +149,7 @@ public class Numbers {
                     return null;
                 value = value.multiply(radixBigInteger).subtract(BigInteger.valueOf(digit));
             }
-            return negative > 0 ? value.negate() : value;
+            return sign > 0 ? value.negate() : value;
         }
 
         private boolean isTheEnd() {

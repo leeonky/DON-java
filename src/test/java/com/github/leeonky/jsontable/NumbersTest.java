@@ -200,6 +200,17 @@ class NumbersTest {
         }
     }
 
+    @Nested
+    class ParseFloat {
+
+        @Test
+        void integer_to_double() {
+            assertParse("1.5", 1.5d);
+            assertParse("10.05", 10.05d);
+            assertParse("1__0.0__5", 1__0.0__5d);
+        }
+    }
+
     @Test
     void invalid_number() {
         assertParse("+", null);
