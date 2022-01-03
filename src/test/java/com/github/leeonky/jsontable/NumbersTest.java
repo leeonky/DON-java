@@ -203,11 +203,26 @@ class NumbersTest {
     @Nested
     class ParseFloat {
 
+        @Nested
+        class FromInteger {
+
+            @Test
+            void integer_to_double() {
+                assertParse("1.5", 1.5d);
+                assertParse("1.", 1.0d);
+                assertParse("10.05", 10.05d);
+                assertParse("1__0.0__5", 1__0.0__5d);
+                assertParse(".5", .5d);
+                assertParse("-.5", -.5d);
+                assertParse("-0.0", -0.0d);
+            }
+        }
+
         @Test
-        void integer_to_double() {
-            assertParse("1.5", 1.5d);
-            assertParse("10.05", 10.05d);
-            assertParse("1__0.0__5", 1__0.0__5d);
+        void invalid_double() {
+            assertParse("0x1.5", null);
+            assertParse("1.1_", null);
+            assertParse("1.n", null);
         }
     }
 

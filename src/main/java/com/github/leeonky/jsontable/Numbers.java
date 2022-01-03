@@ -91,7 +91,7 @@ public class Numbers {
                     continue;
                 }
                 if (c == '.') {
-                    return parseDoubleWithDot(value, sign);
+                    return parseDoubleWithDot(value, sign, radix);
                 }
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
@@ -103,14 +103,22 @@ public class Numbers {
             return -sign * value;
         }
 
-        private Number parseDoubleWithDot(int integer, int sign) {
+        private Number parseDoubleWithDot(int integer, int sign, int radix) {
+            if (radix != 10)
+                return null;
             StringBuilder stringBuilder = new StringBuilder(chars.length);
+            if (integer == 0)
+                stringBuilder.append('-');
             stringBuilder.append(integer);
             stringBuilder.append('.');
             for (char c : leftChars()) {
                 if (c == '_') {
+                    if (isTheEnd())
+                        return null;
                     continue;
                 }
+                if (c > '9' || c < '0')
+                    return null;
                 stringBuilder.append(c);
             }
             return -sign * Double.parseDouble(stringBuilder.toString());
