@@ -90,9 +90,8 @@ public class Numbers {
                         return null;
                     continue;
                 }
-                if (c == '.') {
-                    return parseDoubleWithDot(value, sign, radix);
-                }
+                if (c == '.')
+                    return parseDoubleWithDot(String.valueOf(value), sign, radix);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
@@ -103,11 +102,11 @@ public class Numbers {
             return -sign * value;
         }
 
-        private Number parseDoubleWithDot(int integer, int sign, int radix) {
+        private Number parseDoubleWithDot(String integer, int sign, int radix) {
             if (radix != 10)
                 return null;
             StringBuilder stringBuilder = new StringBuilder(chars.length);
-            if (integer == 0)
+            if (integer.equals("0"))
                 stringBuilder.append('-');
             stringBuilder.append(integer);
             stringBuilder.append('.');
@@ -132,6 +131,8 @@ public class Numbers {
                         return null;
                     continue;
                 }
+                if (c == '.')
+                    return parseDoubleWithDot(String.valueOf(value), sign, radix);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
@@ -152,6 +153,8 @@ public class Numbers {
                         return null;
                     continue;
                 }
+                if (c == '.')
+                    return parseDoubleWithDot(value.toString(), sign, radix);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;

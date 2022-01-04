@@ -216,13 +216,51 @@ class NumbersTest {
                 assertParse("-.5", -.5d);
                 assertParse("-0.0", -0.0d);
             }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x1.5", null);
+                assertParse("1.1_", null);
+                assertParse("1.n", null);
+            }
         }
 
-        @Test
-        void invalid_double() {
-            assertParse("0x1.5", null);
-            assertParse("1.1_", null);
-            assertParse("1.n", null);
+        @Nested
+        class FromLong {
+
+            @Test
+            void long_to_double() {
+                assertParse("2147483648.5", 2147483648.5d);
+                assertParse("2147483648.", 2147483648.0d);
+                assertParse("2147483648.05", 2147483648.05d);
+                assertParse("2147483648.0__5", 2147483648.0__5d);
+            }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x2147483648.5", null);
+                assertParse("2147483648.1_", null);
+                assertParse("2147483648.n", null);
+            }
+        }
+
+        @Nested
+        class FromBigInteger {
+
+            @Test
+            void big_integer_to_double() {
+                assertParse("100000000000000000000.5", 100000000000000000000.5d);
+                assertParse("100000000000000000000.", 100000000000000000000.0d);
+                assertParse("100000000000000000000.05", 100000000000000000000.05d);
+                assertParse("100000000000000000000.0__5", 100000000000000000000.0__5d);
+            }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x100000000000000000015.5", null);
+                assertParse("100000000000000000015.1_", null);
+                assertParse("100000000000000000015.n", null);
+            }
         }
     }
 
@@ -239,3 +277,7 @@ class NumbersTest {
         assertThat(parseNumber(inputCode)).isEqualTo(expected);
     }
 }
+
+// TODO double => BigDecimal
+// TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
+// TODO BigDecimal intently
