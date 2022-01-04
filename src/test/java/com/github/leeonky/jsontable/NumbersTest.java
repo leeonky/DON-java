@@ -207,7 +207,7 @@ class NumbersTest {
         class FromInteger {
 
             @Test
-            void integer_to_double() {
+            void dot_in_integer() {
                 assertParse("1.5", 1.5d);
                 assertParse("1.", 1.0d);
                 assertParse("10.05", 10.05d);
@@ -223,13 +223,39 @@ class NumbersTest {
                 assertParse("1.1_", null);
                 assertParse("1.n", null);
             }
+
+            @Test
+            void power_number_in_integer() {
+                assertParse("10E05", 10E5);
+                assertParse("10E1_5", 10E1_5);
+                assertParse("10E15", 10E15);
+                assertParse("10E-5", 10E-5);
+                assertParse("10E+5", 10E5);
+                assertParse("0E5", 0E5);
+                assertParse("-0E5", -0E5);
+
+//                TODO
+//                assertParse("0.E5", 0E5);
+//                assertParse(".0E5", 0E5);
+//                assertParse("-0.E5", -0E5);
+//                assertParse("-.0E5", -0E5);
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("10E0.5", null);
+                assertParse("10E5_", null);
+                assertParse("10E0xF", null);
+                assertParse("10EA", null);
+                assertParse("0x1E1", 0x1E1);
+            }
         }
 
         @Nested
         class FromLong {
 
             @Test
-            void long_to_double() {
+            void dot_in_long() {
                 assertParse("2147483648.5", 2147483648.5d);
                 assertParse("2147483648.", 2147483648.0d);
                 assertParse("2147483648.05", 2147483648.05d);
@@ -248,7 +274,7 @@ class NumbersTest {
         class FromBigInteger {
 
             @Test
-            void big_integer_to_double() {
+            void dot_in_big_integer() {
                 assertParse("100000000000000000000.5", 100000000000000000000.5d);
                 assertParse("100000000000000000000.", 100000000000000000000.0d);
                 assertParse("100000000000000000000.05", 100000000000000000000.05d);
@@ -262,6 +288,8 @@ class NumbersTest {
                 assertParse("100000000000000000015.n", null);
             }
         }
+
+//        TODO double has E
     }
 
     @Test
@@ -281,3 +309,4 @@ class NumbersTest {
 // TODO double => BigDecimal
 // TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
 // TODO BigDecimal intently
+// TODO 1E10

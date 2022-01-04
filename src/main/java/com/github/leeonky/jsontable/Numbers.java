@@ -92,6 +92,8 @@ public class Numbers {
                 }
                 if (c == '.')
                     return parseDoubleWithDot(String.valueOf(value), sign, radix);
+                if (isPowerChar(radix, c))
+                    return parseDoubleWithPower(String.valueOf(value), sign, radix);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
@@ -102,13 +104,38 @@ public class Numbers {
             return -sign * value;
         }
 
-        private Number parseDoubleWithDot(String integer, int sign, int radix) {
+        private boolean isPowerChar(int radix, char c) {
+            return c == 'e' || c == 'E' && radix == 10;
+        }
+
+        private Number parseDoubleWithPower(String firstPart, int sign, int radix) {
+            StringBuilder stringBuilder = new StringBuilder(chars.length);
+            if (firstPart.equals("0"))
+                stringBuilder.append('-');
+            stringBuilder.append(firstPart);
+            stringBuilder.append('E');
+            if (getSign() < 0)
+                stringBuilder.append('-');
+            for (char c : leftChars()) {
+                if (c == '_') {
+                    if (isTheEnd())
+                        return null;
+                    continue;
+                }
+                if (c > '9' || c < '0')
+                    return null;
+                stringBuilder.append(c);
+            }
+            return -sign * Double.parseDouble(stringBuilder.toString());
+        }
+
+        private Number parseDoubleWithDot(String firstPart, int sign, int radix) {
             if (radix != 10)
                 return null;
             StringBuilder stringBuilder = new StringBuilder(chars.length);
-            if (integer.equals("0"))
+            if (firstPart.equals("0"))
                 stringBuilder.append('-');
-            stringBuilder.append(integer);
+            stringBuilder.append(firstPart);
             stringBuilder.append('.');
             for (char c : leftChars()) {
                 if (c == '_') {
