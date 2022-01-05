@@ -209,19 +209,23 @@ class NumbersTest {
             @Test
             void dot_in_integer() {
                 assertParse("1.5", 1.5d);
-                assertParse("1.", 1.0d);
                 assertParse("10.05", 10.05d);
                 assertParse("1__0.0__5", 1__0.0__5d);
-                assertParse(".5", .5d);
-                assertParse("-.5", -.5d);
                 assertParse("-0.0", -0.0d);
+            }
+
+            @Test
+            void dot_should_between_number() {
+                assertParse("1.", null);
+                assertParse("-.5", null);
+                assertParse(".5", null);
+                assertParse("1.n", null);
             }
 
             @Test
             void invalid_double() {
                 assertParse("0x1.5", null);
                 assertParse("1.1_", null);
-                assertParse("1.n", null);
             }
 
             @Test
@@ -234,11 +238,6 @@ class NumbersTest {
                 assertParse("0E5", 0E5);
                 assertParse("-0E5", -0E5);
 
-//                TODO
-//                assertParse("0.E5", 0E5);
-//                assertParse(".0E5", 0E5);
-//                assertParse("-0.E5", -0E5);
-//                assertParse("-.0E5", -0E5);
             }
 
             @Test
@@ -247,7 +246,10 @@ class NumbersTest {
                 assertParse("10E5_", null);
                 assertParse("10E0xF", null);
                 assertParse("10EA", null);
+                assertParse("e1", null);
+                assertParse("-e1", null);
                 assertParse("0x1E1", 0x1E1);
+                assertParse("10E", null);
             }
         }
 
@@ -257,16 +259,40 @@ class NumbersTest {
             @Test
             void dot_in_long() {
                 assertParse("2147483648.5", 2147483648.5d);
-                assertParse("2147483648.", 2147483648.0d);
                 assertParse("2147483648.05", 2147483648.05d);
                 assertParse("2147483648.0__5", 2147483648.0__5d);
+            }
+
+            @Test
+            void dot_should_between_number() {
+                assertParse("2147483648.", null);
+                assertParse("2147483648.n", null);
             }
 
             @Test
             void invalid_double() {
                 assertParse("0x2147483648.5", null);
                 assertParse("2147483648.1_", null);
-                assertParse("2147483648.n", null);
+            }
+
+            @Test
+            void power_number_in_integer() {
+                assertParse("2147483648E05", 2147483648E5);
+                assertParse("2147483648E1_5", 2147483648E1_5);
+                assertParse("2147483648E15", 2147483648E15);
+                assertParse("2147483648E-5", 2147483648E-5);
+                assertParse("2147483648E+5", 2147483648E5);
+
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("2147483648E0.5", null);
+                assertParse("2147483648E5_", null);
+                assertParse("2147483648E0xF", null);
+                assertParse("2147483648EA", null);
+                assertParse("0x8FFFFFFFE1", 0x8FFFFFFFE1L);
+                assertParse("2147483648E", null);
             }
         }
 
@@ -276,20 +302,59 @@ class NumbersTest {
             @Test
             void dot_in_big_integer() {
                 assertParse("100000000000000000000.5", 100000000000000000000.5d);
-                assertParse("100000000000000000000.", 100000000000000000000.0d);
                 assertParse("100000000000000000000.05", 100000000000000000000.05d);
                 assertParse("100000000000000000000.0__5", 100000000000000000000.0__5d);
+            }
+
+            @Test
+            void dot_should_between_number() {
+                assertParse("100000000000000000000.", null);
+                assertParse("100000000000000000015.n", null);
             }
 
             @Test
             void invalid_double() {
                 assertParse("0x100000000000000000015.5", null);
                 assertParse("100000000000000000015.1_", null);
-                assertParse("100000000000000000015.n", null);
+            }
+
+            @Test
+            void power_number_in_integer() {
+                assertParse("100000000000000000015E05", 100000000000000000015E5);
+                assertParse("100000000000000000015E1_5", 100000000000000000015E1_5);
+                assertParse("100000000000000000015E15", 100000000000000000015E15);
+                assertParse("100000000000000000015E-5", 100000000000000000015E-5);
+                assertParse("100000000000000000015E+5", 100000000000000000015E5);
+
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("100000000000000000015E0.5", null);
+                assertParse("100000000000000000015E5_", null);
+                assertParse("100000000000000000015E0xF", null);
+                assertParse("100000000000000000015EA", null);
+                assertParse("0x100000000000000000015EA", new BigInteger("100000000000000000015EA", 16));
+                assertParse("100000000000000000015E", null);
             }
         }
 
-//        TODO double has E
+        @Test
+        void power_number_in_double() {
+            assertParse("0.1E5", 0.1E5);
+            assertParse("0.12E5", 0.12E5);
+            assertParse("13.24E5", 13.24E5);
+        }
+
+        @Test
+        void power_char_should_between_number() {
+            assertParse(".E0", null);
+            assertParse(".e0", null);
+            assertParse("0E", null);
+            assertParse("0e", null);
+            assertParse("0ex", null);
+            assertParse("0E.0", null);
+        }
     }
 
     @Test
@@ -299,6 +364,7 @@ class NumbersTest {
         assertParse("1_", null);
         assertParse("", null);
         assertParse("notNumber", null);
+        assertParse(".", null);
     }
 
     private void assertParse(String inputCode, Number expected) {
@@ -309,4 +375,6 @@ class NumbersTest {
 // TODO double => BigDecimal
 // TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
 // TODO BigDecimal intently
-// TODO 1E10
+// TODO BigDecimal has E
+// TODO Number should start with number char
+

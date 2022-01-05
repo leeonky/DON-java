@@ -85,15 +85,12 @@ public class Numbers {
             int value = 0;
             IntegerBoundary integerBoundary = new IntegerBoundary(sign, radix);
             for (char c : leftChars()) {
-                if (c == '_') {
-                    if (isTheEnd())
-                        return null;
+                if (isUnderScore(c))
                     continue;
-                }
-                if (c == '.')
+                if (isDot(c, radix))
                     return parseDoubleWithDot(String.valueOf(value), sign, radix);
                 if (isPowerChar(radix, c))
-                    return parseDoubleWithPower(String.valueOf(value), sign, radix);
+                    return parseDoubleWithPower(String.valueOf(value), sign);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
@@ -104,11 +101,27 @@ public class Numbers {
             return -sign * value;
         }
 
-        private boolean isPowerChar(int radix, char c) {
-            return c == 'e' || c == 'E' && radix == 10;
+        private boolean isDot(char c, int radix) {
+            return c == '.' && radix == 10 && betweenDigit();
         }
 
-        private Number parseDoubleWithPower(String firstPart, int sign, int radix) {
+        private boolean betweenDigit() {
+            return isPreviousDigit() && !isTheEnd() && !notDigit(chars[index]);
+        }
+
+        private boolean isPreviousDigit() {
+            return index > 1 && !notDigit(chars[index - 2]);
+        }
+
+        private boolean isPowerChar(int radix, char c) {
+            return (c == 'e' || c == 'E') && radix == 10 && isPreviousDigit() && !isTheEnd() && digitOrSign(chars[index]);
+        }
+
+        private boolean digitOrSign(char c) {
+            return !notDigit(c) || c == '+' || c == '-';
+        }
+
+        private Number parseDoubleWithPower(String firstPart, int sign) {
             StringBuilder stringBuilder = new StringBuilder(chars.length);
             if (firstPart.equals("0"))
                 stringBuilder.append('-');
@@ -117,33 +130,31 @@ public class Numbers {
             if (getSign() < 0)
                 stringBuilder.append('-');
             for (char c : leftChars()) {
-                if (c == '_') {
-                    if (isTheEnd())
-                        return null;
+                if (isUnderScore(c))
                     continue;
-                }
-                if (c > '9' || c < '0')
+                if (notDigit(c))
                     return null;
                 stringBuilder.append(c);
             }
             return -sign * Double.parseDouble(stringBuilder.toString());
         }
 
+        private boolean notDigit(char c) {
+            return c > '9' || c < '0';
+        }
+
         private Number parseDoubleWithDot(String firstPart, int sign, int radix) {
-            if (radix != 10)
-                return null;
             StringBuilder stringBuilder = new StringBuilder(chars.length);
             if (firstPart.equals("0"))
                 stringBuilder.append('-');
             stringBuilder.append(firstPart);
             stringBuilder.append('.');
             for (char c : leftChars()) {
-                if (c == '_') {
-                    if (isTheEnd())
-                        return null;
+                if (isUnderScore(c))
                     continue;
-                }
-                if (c > '9' || c < '0')
+                if (isPowerChar(radix, c))
+                    return parseDoubleWithPower(stringBuilder.toString(), sign);
+                if (notDigit(c))
                     return null;
                 stringBuilder.append(c);
             }
@@ -153,13 +164,12 @@ public class Numbers {
         private Number parseLong(long value, int sign, int radix) {
             LongBoundary longBoundary = new LongBoundary(sign, radix);
             for (char c : leftChars()) {
-                if (c == '_') {
-                    if (isTheEnd())
-                        return null;
+                if (isUnderScore(c))
                     continue;
-                }
-                if (c == '.')
+                if (isDot(c, radix))
                     return parseDoubleWithDot(String.valueOf(value), sign, radix);
+                if (isPowerChar(radix, c))
+                    return parseDoubleWithPower(String.valueOf(value), sign);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
@@ -172,16 +182,19 @@ public class Numbers {
             return -sign * value;
         }
 
+        private boolean isUnderScore(char c) {
+            return c == '_' && !isTheEnd();
+        }
+
         private Number parseBigInteger(BigInteger value, int sign, int radix) {
             BigInteger radixBigInteger = BigInteger.valueOf(radix);
             for (char c : leftChars()) {
-                if (c == '_') {
-                    if (isTheEnd())
-                        return null;
+                if (isUnderScore(c))
                     continue;
-                }
-                if (c == '.')
+                if (isDot(c, radix))
                     return parseDoubleWithDot(value.toString(), sign, radix);
+                if (isPowerChar(radix, c))
+                    return parseDoubleWithPower(value.toString(), sign);
                 int digit = Character.digit(c, radix);
                 if (digit < 0)
                     return null;
