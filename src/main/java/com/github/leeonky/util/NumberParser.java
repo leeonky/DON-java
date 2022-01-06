@@ -1,18 +1,29 @@
-package com.github.leeonky.jsontable;
+package com.github.leeonky.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-public class Numbers {
+public class NumberParser {
+    private static NumberParser instance;
 
-    public static Number parseNumber(String content) {
+    public static NumberParser getInstance() {
+        if (instance == null)
+            instance = new NumberParser();
+        return instance;
+    }
+
+    public Number parse(String content) {
         if (content.length() == 0)
             return null;
         Token token = new Token(content);
         int sign = token.getSign();
         int radix = token.getRadix();
         return token.parseFromInteger(sign, radix);
+    }
+
+    public static Number parseNumber(String content) {
+        return getInstance().parse(content);
     }
 
     private static class Token {
@@ -84,7 +95,7 @@ public class Numbers {
             if (isTheEnd())
                 return null;
             int value = 0;
-            IntegerBoundary integerBoundary = new IntegerBoundary(sign, radix);
+            Token.IntegerBoundary integerBoundary = new Token.IntegerBoundary(sign, radix);
             for (char c : leftChars()) {
                 if (isUnderScore(c))
                     continue;
@@ -172,7 +183,7 @@ public class Numbers {
         }
 
         private Number parseLong(long value, int sign, int radix) {
-            LongBoundary longBoundary = new LongBoundary(sign, radix);
+            Token.LongBoundary longBoundary = new Token.LongBoundary(sign, radix);
             for (char c : leftChars()) {
                 if (isUnderScore(c))
                     continue;

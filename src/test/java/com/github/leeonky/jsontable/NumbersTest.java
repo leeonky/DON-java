@@ -1,5 +1,6 @@
 package com.github.leeonky.jsontable;
 
+import com.github.leeonky.util.NumberParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -7,7 +8,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 
-import static com.github.leeonky.jsontable.Numbers.parseNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NumbersTest {
@@ -387,11 +387,31 @@ class NumbersTest {
 
     private void assertParse(String inputCode, Number expected) {
         if (expected instanceof BigDecimal) {
-            assertThat(((BigDecimal) parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
+            assertThat(((BigDecimal) NumberParser.parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
         } else
-            assertThat(parseNumber(inputCode)).isEqualTo(expected);
+            assertThat(NumberParser.parseNumber(inputCode)).isEqualTo(expected);
+    }
+
+    @Nested
+    class Postfix {
+
+        @Nested
+        class AsByte {
+
+            @Nested
+            class Radix10 {
+
+            }
+
+            @Nested
+            class Radix16 {
+
+            }
+        }
     }
 }
 
 // TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
 // TODO BigDecimal intently
+// TODO 0B
+// TODO configurable radix postfix
