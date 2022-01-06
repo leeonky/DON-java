@@ -26,6 +26,7 @@ class NumbersTest {
                 assertParse("1_000", 1_000);
                 assertParse("+24", 24);
                 assertParse("2147483647", 2147483647);
+                assertParse("1234567890", 1234567890);
             }
 
             @Test
@@ -48,6 +49,7 @@ class NumbersTest {
                 assertParse("-", null);
                 assertParse("1_", null);
                 assertParse("1x", null);
+                assertParse("F", null);
             }
         }
 
@@ -78,6 +80,7 @@ class NumbersTest {
 
             @Test
             void invalid_number() {
+                assertParse("0x", null);
                 assertParse("+0x", null);
                 assertParse("-0x", null);
                 assertParse("0x1_", null);
@@ -214,6 +217,7 @@ class NumbersTest {
                 assertParse("10.05", 10.05d);
                 assertParse("1__0.0__5", 1__0.0__5d);
                 assertParse("-0.0", -0.0d);
+                assertParse("0.123456789", 0.123456789d);
             }
 
             @Test
@@ -247,7 +251,7 @@ class NumbersTest {
                 assertParse("10E0.5", null);
                 assertParse("10E5_", null);
                 assertParse("10E0xF", null);
-                assertParse("10EA", null);
+                assertParse("10Ea", null);
                 assertParse("e1", null);
                 assertParse("-e1", null);
                 assertParse("0x1E1", 0x1E1);

@@ -70,8 +70,8 @@ test {
 }
 
 pitest {
-    targetClasses = ['com.github.leeonky.jsontable.*']
-    excludedClasses = ['com.github.leeonky.jsontable.cucumber.*']
+    targetClasses = ['com.github.leeonky.*']
+//    excludedClasses = ['com.github.leeonky.jsontable.cucumber.*']
     outputFormats = ['HTML2']
     pitestVersion = '1.6.9'
     threads = 8
