@@ -3,7 +3,9 @@ package com.github.leeonky.jsontable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 
 import static com.github.leeonky.jsontable.Numbers.parseNumber;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -367,14 +369,29 @@ class NumbersTest {
         assertParse(".", null);
     }
 
+    @Nested
+    class ParseBigDecimal {
+
+        @Test
+        void to_big_decimal_with_huge_power() {
+            assertParse("100E400", new BigDecimal("100E400"));
+            assertParse("-100E400", new BigDecimal("-100E400"));
+        }
+
+        @Test
+        void long_float_to_big_decimal() {
+            assertParse("1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("1.0E400"));
+            assertParse("-1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("-1.0E400"));
+        }
+    }
+
     private void assertParse(String inputCode, Number expected) {
-        assertThat(parseNumber(inputCode)).isEqualTo(expected);
+        if (expected instanceof BigDecimal) {
+            assertThat(((BigDecimal) parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
+        } else
+            assertThat(parseNumber(inputCode)).isEqualTo(expected);
     }
 }
 
-// TODO double => BigDecimal
 // TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
 // TODO BigDecimal intently
-// TODO BigDecimal has E
-// TODO Number should start with number char
-

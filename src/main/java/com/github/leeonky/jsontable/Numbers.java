@@ -1,5 +1,6 @@
 package com.github.leeonky.jsontable;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 
@@ -11,7 +12,7 @@ public class Numbers {
         Token token = new Token(content);
         int sign = token.getSign();
         int radix = token.getRadix();
-        return token.parseInteger(sign, radix);
+        return token.parseFromInteger(sign, radix);
     }
 
     private static class Token {
@@ -79,7 +80,7 @@ public class Numbers {
             }
         }
 
-        public Number parseInteger(int sign, int radix) {
+        public Number parseFromInteger(int sign, int radix) {
             if (isTheEnd())
                 return null;
             int value = 0;
@@ -136,7 +137,16 @@ public class Numbers {
                     return null;
                 stringBuilder.append(c);
             }
-            return -sign * Double.parseDouble(stringBuilder.toString());
+            return toDoubleOrBigDecimal(sign, stringBuilder.toString());
+        }
+
+        private Number toDoubleOrBigDecimal(int sign, String content) {
+            double value = Double.parseDouble(content);
+            if (Double.isInfinite(value)) {
+                BigDecimal bigDecimal = new BigDecimal(content);
+                return sign > 0 ? bigDecimal.negate() : bigDecimal;
+            } else
+                return -sign * value;
         }
 
         private boolean notDigit(char c) {
@@ -158,7 +168,7 @@ public class Numbers {
                     return null;
                 stringBuilder.append(c);
             }
-            return -sign * Double.parseDouble(stringBuilder.toString());
+            return toDoubleOrBigDecimal(sign, stringBuilder.toString());
         }
 
         private Number parseLong(long value, int sign, int radix) {
