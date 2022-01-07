@@ -23,6 +23,10 @@ abstract class Parser<T extends Number, O extends Number> {
                 postfix = String.valueOf(c);
                 break;
             }
+            if (c == 's' && numberContext.atTheEnd()) {
+                postfix = String.valueOf(c);
+                break;
+            }
             int digit = Character.digit(c, numberContext.getRadix());
             if (digit < 0)
                 return null;

@@ -405,7 +405,7 @@ class NumbersTest {
         class AsByte {
 
             @Test
-            void integer_as_byte_in_radix10() {
+            void integer_as_byte() {
                 assertParse("0y", (byte) 0);
                 assertParse("1y", (byte) 1);
                 assertParse("-1y", (byte) -1);
@@ -416,6 +416,20 @@ class NumbersTest {
 
                 assertParseOverflow("128y");
                 assertParseOverflow("-129y");
+            }
+
+            @Test
+            void integer_as_short() {
+                assertParse("0s", (short) 0);
+                assertParse("1s", (short) 1);
+                assertParse("-1s", (short) -1);
+                assertParse("-32768s", (short) -32768);
+                assertParse("32767s", (short) 32767);
+                assertParse("-0x8000s", (short) -32768);
+                assertParse("0x7fffs", (short) 32767);
+
+                assertParseOverflow("32768s");
+                assertParseOverflow("-32769s");
             }
         }
     }

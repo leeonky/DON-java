@@ -33,11 +33,14 @@ class IntegerParser extends Parser<Integer, Long> {
     @Override
     public Number convertByPostfix(String postfix, Integer value) {
         switch (postfix) {
-            case "y": {
+            case "y":
                 if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE)
                     throw new NumberOverflowException(numberContext.getContent());
                 return value.byteValue();
-            }
+            case "s":
+                if (value > Short.MAX_VALUE || value < Short.MIN_VALUE)
+                    throw new NumberOverflowException(numberContext.getContent());
+                return value.shortValue();
         }
         return value;
     }
