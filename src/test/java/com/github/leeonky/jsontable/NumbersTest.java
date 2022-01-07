@@ -1,6 +1,6 @@
 package com.github.leeonky.jsontable;
 
-import com.github.leeonky.util.NumberParser;
+import com.github.leeonky.util.NumberContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +45,7 @@ class NumbersTest {
 
             @Test
             void invalid_number() {
+                assertParse(null, null);
                 assertParse("+", null);
                 assertParse("-", null);
                 assertParse("1_", null);
@@ -391,9 +392,9 @@ class NumbersTest {
 
     private void assertParse(String inputCode, Number expected) {
         if (expected instanceof BigDecimal) {
-            assertThat(((BigDecimal) NumberParser.parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
+            assertThat(((BigDecimal) NumberContext.parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
         } else
-            assertThat(NumberParser.parseNumber(inputCode)).isEqualTo(expected);
+            assertThat(NumberContext.parseNumber(inputCode)).isEqualTo(expected);
     }
 
     @Nested
