@@ -3,25 +3,16 @@ package com.github.leeonky.util;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
-public class NumberContext {
+class NumberContext {
     private int currentIndex;
     private final String content;
     private final int sign;
     private final int radix;
 
-    private NumberContext(String code) {
+    public NumberContext(String code) {
         content = code;
         sign = parseSign();
         radix = parseRadix();
-    }
-
-    public static Number parseNumber(String content) {
-        if (content == null || content.length() == 0)
-            return null;
-        NumberContext numberContext = new NumberContext(content);
-        if (numberContext.atTheEnd())
-            return null;
-        return new IntegerParser(numberContext).parse(0);
     }
 
     private boolean compareAndTake(String str) {
@@ -143,5 +134,9 @@ public class NumberContext {
 
     public int getRadix() {
         return radix;
+    }
+
+    public String getContent() {
+        return content;
     }
 }

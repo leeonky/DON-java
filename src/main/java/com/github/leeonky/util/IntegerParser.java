@@ -29,4 +29,16 @@ class IntegerParser extends Parser<Integer, Long> {
     public boolean isOverflow(int digit) {
         return number < limitBeforeMul || number * numberContext.getRadix() < limit + digit;
     }
+
+    @Override
+    public Number convertByPostfix(String postfix, Integer value) {
+        switch (postfix) {
+            case "y": {
+                if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE)
+                    throw new NumberOverflowException(numberContext.getContent());
+                return value.byteValue();
+            }
+        }
+        return value;
+    }
 }

@@ -1,6 +1,5 @@
-package com.github.leeonky.jsontable;
+package com.github.leeonky.util;
 
-import com.github.leeonky.util.NumberContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +7,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 
+import static com.github.leeonky.util.Numbers.parseNumber;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NumbersTest {
 
@@ -392,9 +393,9 @@ class NumbersTest {
 
     private void assertParse(String inputCode, Number expected) {
         if (expected instanceof BigDecimal) {
-            assertThat(((BigDecimal) NumberContext.parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
+            assertThat(((BigDecimal) parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
         } else
-            assertThat(NumberContext.parseNumber(inputCode)).isEqualTo(expected);
+            assertThat(parseNumber(inputCode)).isEqualTo(expected);
     }
 
     @Nested
@@ -403,16 +404,26 @@ class NumbersTest {
         @Nested
         class AsByte {
 
-            @Nested
-            class Radix10 {
+            @Test
+            void integer_as_byte_in_radix10() {
+                assertParse("0y", (byte) 0);
+                assertParse("1y", (byte) 1);
+                assertParse("-1y", (byte) -1);
+                assertParse("-128y", (byte) -128);
+                assertParse("127y", (byte) 127);
+                assertParse("-0x80y", (byte) -128);
+                assertParse("0x7fy", (byte) 127);
 
-            }
-
-            @Nested
-            class Radix16 {
-
+                assertParseOverflow("128y");
+                assertParseOverflow("-129y");
             }
         }
+    }
+
+    private void assertParseOverflow(String code) {
+        assertThat(assertThrows(NumberOverflowException.class, () -> parseNumber(code)))
+                .hasMessageContaining(String.format("Cannon save [%s] with the given postfix type", code));
+
     }
 }
 
