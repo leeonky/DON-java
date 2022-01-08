@@ -16,9 +16,13 @@ class Postfix<N extends Number & Comparable<N>> {
     }
 
     public Number transform(N value, String content) {
-        if (value.compareTo(maxValue) > 0 || value.compareTo(minValue) < 0)
+        if (isOverflow(value))
             throw new NumberOverflowException(content);
         return convertor.apply(value);
+    }
+
+    protected boolean isOverflow(N value) {
+        return value.compareTo(maxValue) > 0 || value.compareTo(minValue) < 0;
     }
 
     public boolean matches(Parser<N, ?> parser) {

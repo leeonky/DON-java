@@ -20,6 +20,7 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
 
     public Number parse(T base) {
         number = base;
+//        TODO refactor
         Postfix<T> postfix = fetchPostfix();
         if (postfix != null)
             return postfix.transform(combineSignAndResult(), numberContext.getContent());

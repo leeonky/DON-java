@@ -402,10 +402,10 @@ class NumbersTest {
     class Postfix {
 
         @Nested
-        class AsByte {
+        class IntegerParse {
 
             @Test
-            void integer_as_byte() {
+            void as_byte() {
                 assertParse("0y", (byte) 0);
                 assertParse("1y", (byte) 1);
                 assertParse("-1y", (byte) -1);
@@ -422,12 +422,10 @@ class NumbersTest {
             }
 
             @Test
-            void integer_as_short() {
+            void as_short() {
                 assertParse("0s", (short) 0);
                 assertParse("1s", (short) 1);
                 assertParse("-1s", (short) -1);
-                assertParse("-32768s", (short) -32768);
-                assertParse("32767s", (short) 32767);
                 assertParse("-0x8000s", (short) -32768);
                 assertParse("0x7fffs", (short) 32767);
 
@@ -436,17 +434,78 @@ class NumbersTest {
             }
 
             @Test
-            void integer_as_long() {
+            void as_long() {
                 assertParse("0l", 0L);
                 assertParse("1l", 1L);
                 assertParse("-1l", -1L);
-                assertParse("-32768l", -32768L);
-                assertParse("32767l", 32767L);
                 assertParse("-0x8000_0000l", -2147483648L);
                 assertParse("0x7fff_ffffl", 2147483647L);
+            }
 
+            @Test
+            void as_big_integer() {
+                assertParse("0bi", BigInteger.valueOf(0));
+                assertParse("10bi", BigInteger.valueOf(10));
+                assertParse("-10bi", BigInteger.valueOf(-10));
+            }
+        }
+
+        @Nested
+        class LongParse {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0xffff_ffff_ffy");
+                assertParseOverflow("-0xffff_ffff_ffy");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0xffff_ffff_ffs");
+                assertParseOverflow("-0xffff_ffff_ffs");
+            }
+
+            @Test
+            void as_long() {
+                assertParse("-0x8000_0001l", -2147483649L);
+                assertParse("0x8000_0000l", 2147483648L);
+
+                assertParse("-0x8000_0000_0000_0000l", 0x8000_0000_0000_0000L);
+                assertParse("0x7fff_ffff_ffff_ffff", 0x7fff_ffff_ffff_ffffL);
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParse("0xffff_ffff_ffbi", new BigInteger("ffffffffff", 16));
+                assertParse("-0xffff_ffff_ffbi", new BigInteger("-ffffffffff", 16));
+            }
+        }
+
+        @Nested
+        class BigDecimalParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0x8000_0000_0000_0000y");
+                assertParseOverflow("-0x8000_0000_0000_0001y");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0x8000_0000_0000_0000s");
+                assertParseOverflow("-0x8000_0000_0000_0001s");
+            }
+
+            @Test
+            void as_long() {
                 assertParseOverflow("0x8000_0000_0000_0000l");
                 assertParseOverflow("-0x8000_0000_0000_0001l");
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParse("0x8000_0000_0000_0000bi", new BigInteger("8000000000000000", 16));
+                assertParse("-0x8000_0000_0000_0001bi", new BigInteger("-8000000000000001", 16));
             }
         }
     }
@@ -458,7 +517,7 @@ class NumbersTest {
     }
 }
 
-// TODO postfix Ll Dd Ff Ss Ll Yy BI bi BD bd
+// TODO postfix BD bd
 // TODO BigDecimal intently
 // TODO 0B
 // TODO configurable radix postfix
