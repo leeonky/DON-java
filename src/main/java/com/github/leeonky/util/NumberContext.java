@@ -139,4 +139,8 @@ class NumberContext {
     public String getContent() {
         return content;
     }
+
+    public boolean endsWith(String postfix) {
+        return currentIndex == content.length() - postfix.length() && content.endsWith(postfix);
+    }
 }

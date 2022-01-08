@@ -1,40 +1,44 @@
 package com.github.leeonky.util;
 
+import java.util.List;
 import java.util.function.Supplier;
 
-abstract class Parser<T extends Number, O extends Number> {
+import static java.util.Arrays.asList;
+
+abstract class Parser<T extends Number & Comparable<T>, O extends Number & Comparable<O>> {
     protected final NumberContext numberContext;
     protected T number;
     protected final Supplier<Parser<O, ?>> overflowParser;
+    private final List<Postfix<T>> postfixes;
 
-    public Parser(NumberContext numberContext, Supplier<Parser<O, ?>> overflowParser) {
+    @SuppressWarnings("unchecked")
+    public Parser(NumberContext numberContext, Supplier<Parser<O, ?>> overflowParser, Postfix<T>... postfixes) {
         this.numberContext = numberContext;
         this.overflowParser = overflowParser;
+        this.postfixes = asList(postfixes);
     }
 
     public Number parse(T base) {
         number = base;
-        String postfix = "";
         for (char c : numberContext.leftChars()) {
             Number doubleDecimal = numberContext.tryParseDoubleOrDecimal(number, c);
             if (doubleDecimal != null)
                 return doubleDecimal;
-            if (c == 'y' && numberContext.atTheEnd()) {
-                postfix = String.valueOf(c);
-                break;
-            }
-            if (c == 's' && numberContext.atTheEnd()) {
-                postfix = String.valueOf(c);
-                break;
-            }
             int digit = Character.digit(c, numberContext.getRadix());
             if (digit < 0)
                 return null;
             if (isOverflow(digit))
                 return overflowParser.get().parse(appendOverflowDigit(digit));
             appendDigit(digit);
+            Postfix<T> postfix = fetchPostfix();
+            if (postfix != null)
+                return postfix.transform(combineSignAndResult(), numberContext.getContent());
         }
-        return convertByPostfix(postfix, combineSignAndResult());
+        return combineSignAndResult();
+    }
+
+    private Postfix<T> fetchPostfix() {
+        return postfixes.stream().filter(p -> p.matches(this)).findFirst().orElse(null);
     }
 
     public abstract T combineSignAndResult();
@@ -42,10 +46,6 @@ abstract class Parser<T extends Number, O extends Number> {
     public abstract O appendOverflowDigit(int digit);
 
     public abstract void appendDigit(int digit);
-
-    public Number convertByPostfix(String postfix, T value) {
-        return value;
-    }
 
     public abstract boolean isOverflow(int digit);
 }

@@ -4,8 +4,12 @@ class IntegerParser extends Parser<Integer, Long> {
     private final int limit;
     private final int limitBeforeMul;
 
+    @SuppressWarnings("unchecked")
     public IntegerParser(NumberContext numberContext) {
-        super(numberContext, () -> new LongParser(numberContext));
+        super(numberContext, () -> new LongParser(numberContext),
+                new Postfix<>("y", (int) Byte.MAX_VALUE, (int) Byte.MIN_VALUE, Integer::byteValue),
+                new Postfix<>("s", (int) Short.MAX_VALUE, (int) Short.MIN_VALUE, Integer::shortValue)
+        );
         limit = numberContext.getSign() == 1 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
         limitBeforeMul = limit / numberContext.getRadix();
     }
@@ -28,20 +32,5 @@ class IntegerParser extends Parser<Integer, Long> {
     @Override
     public boolean isOverflow(int digit) {
         return number < limitBeforeMul || number * numberContext.getRadix() < limit + digit;
-    }
-
-    @Override
-    public Number convertByPostfix(String postfix, Integer value) {
-        switch (postfix) {
-            case "y":
-                if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE)
-                    throw new NumberOverflowException(numberContext.getContent());
-                return value.byteValue();
-            case "s":
-                if (value > Short.MAX_VALUE || value < Short.MIN_VALUE)
-                    throw new NumberOverflowException(numberContext.getContent());
-                return value.shortValue();
-        }
-        return value;
     }
 }

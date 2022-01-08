@@ -2,7 +2,7 @@ package com.github.leeonky.util;
 
 import java.math.BigInteger;
 
-class BigIntegerParser extends Parser<BigInteger, Number> {
+class BigIntegerParser extends Parser<BigInteger, BigInteger> {
     private final BigInteger radixBigInteger;
 
     public BigIntegerParser(NumberContext numberContext) {
@@ -16,7 +16,7 @@ class BigIntegerParser extends Parser<BigInteger, Number> {
     }
 
     @Override
-    public Number appendOverflowDigit(int digit) {
+    public BigInteger appendOverflowDigit(int digit) {
         return null;
     }
 
