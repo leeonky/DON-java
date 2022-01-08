@@ -8,7 +8,8 @@ class IntegerParser extends Parser<Integer, Long> {
     public IntegerParser(NumberContext numberContext) {
         super(numberContext, () -> new LongParser(numberContext),
                 new Postfix<>("y", (int) Byte.MAX_VALUE, (int) Byte.MIN_VALUE, Integer::byteValue),
-                new Postfix<>("s", (int) Short.MAX_VALUE, (int) Short.MIN_VALUE, Integer::shortValue)
+                new Postfix<>("s", (int) Short.MAX_VALUE, (int) Short.MIN_VALUE, Integer::shortValue),
+                new Postfix<>("l", Integer.MAX_VALUE, Integer.MIN_VALUE, Integer::longValue)
         );
         limit = numberContext.getSign() == 1 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
         limitBeforeMul = limit / numberContext.getRadix();

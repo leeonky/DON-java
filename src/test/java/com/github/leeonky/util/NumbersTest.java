@@ -414,6 +414,9 @@ class NumbersTest {
                 assertParse("-0x80y", (byte) -128);
                 assertParse("0x7fy", (byte) 127);
 
+                assertParse("0Y", (byte) 0);
+                assertParse("1Y", (byte) 1);
+
                 assertParseOverflow("128y");
                 assertParseOverflow("-129y");
             }
@@ -430,6 +433,20 @@ class NumbersTest {
 
                 assertParseOverflow("32768s");
                 assertParseOverflow("-32769s");
+            }
+
+            @Test
+            void integer_as_long() {
+                assertParse("0l", 0L);
+                assertParse("1l", 1L);
+                assertParse("-1l", -1L);
+                assertParse("-32768l", -32768L);
+                assertParse("32767l", 32767L);
+                assertParse("-0x8000_0000l", -2147483648L);
+                assertParse("0x7fff_ffffl", 2147483647L);
+
+                assertParseOverflow("0x8000_0000_0000_0000l");
+                assertParseOverflow("-0x8000_0000_0000_0001l");
             }
         }
     }

@@ -22,6 +22,6 @@ class Postfix<N extends Number & Comparable<N>> {
     }
 
     public boolean matches(Parser<N, ?> parser) {
-        return parser.numberContext.endsWith(postfix);
+        return parser.numberContext.endsWith(postfix) || parser.numberContext.endsWith(postfix.toUpperCase());
     }
 }

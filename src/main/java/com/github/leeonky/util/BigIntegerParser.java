@@ -2,12 +2,16 @@ package com.github.leeonky.util;
 
 import java.math.BigInteger;
 
+import static java.math.BigInteger.valueOf;
+
 class BigIntegerParser extends Parser<BigInteger, BigInteger> {
     private final BigInteger radixBigInteger;
 
+    @SuppressWarnings("unchecked")
     public BigIntegerParser(NumberContext numberContext) {
-        super(numberContext, null);
-        radixBigInteger = BigInteger.valueOf(numberContext.getRadix());
+        super(numberContext, null,
+                new Postfix<>("l", valueOf(Long.MAX_VALUE), valueOf(Long.MIN_VALUE), BigInteger::longValue));
+        radixBigInteger = valueOf(numberContext.getRadix());
     }
 
     @Override
@@ -22,7 +26,7 @@ class BigIntegerParser extends Parser<BigInteger, BigInteger> {
 
     @Override
     public void appendDigit(int digit) {
-        number = number.multiply(radixBigInteger).subtract(BigInteger.valueOf(digit));
+        number = number.multiply(radixBigInteger).subtract(valueOf(digit));
     }
 
     @Override

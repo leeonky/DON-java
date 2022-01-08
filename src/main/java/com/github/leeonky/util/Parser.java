@@ -20,6 +20,9 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
 
     public Number parse(T base) {
         number = base;
+        Postfix<T> postfix = fetchPostfix();
+        if (postfix != null)
+            return postfix.transform(combineSignAndResult(), numberContext.getContent());
         for (char c : numberContext.leftChars()) {
             Number doubleDecimal = numberContext.tryParseDoubleOrDecimal(number, c);
             if (doubleDecimal != null)
@@ -30,7 +33,7 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
             if (isOverflow(digit))
                 return overflowParser.get().parse(appendOverflowDigit(digit));
             appendDigit(digit);
-            Postfix<T> postfix = fetchPostfix();
+            postfix = fetchPostfix();
             if (postfix != null)
                 return postfix.transform(combineSignAndResult(), numberContext.getContent());
         }
