@@ -21,21 +21,19 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
     protected final NumberContext numberContext;
     protected T number;
     protected final Supplier<Parser<O, ?>> overflowParser;
-    private final Postfix<T>[] postfixes;
+    private final Postfix<T> postfix;
 
     public Parser(NumberContext numberContext, Supplier<Parser<O, ?>> overflowParser, Postfix<T>[] postfixes) {
         this.numberContext = numberContext;
         this.overflowParser = overflowParser;
-        this.postfixes = postfixes;
+        postfix = fetchPostfix(postfixes);
     }
 
     public Number parse(T base) {
         number = base;
-        //        TODO refactor
-        Postfix<T> postfix = fetchPostfix();
-        if (postfix != null)
-            return postfix.transform(combineSignAndResult(), numberContext.getContent());
         for (char c : numberContext.leftChars()) {
+            if (endsWithPostfix())
+                return postfix.transform(combineSignAndResult(), numberContext);
             Number doubleDecimal = numberContext.tryParseDoubleOrDecimal(number, c);
             if (doubleDecimal != null)
                 return doubleDecimal;
@@ -45,16 +43,17 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
             if (isOverflow(digit))
                 return overflowParser.get().parse(appendOverflowDigit(digit));
             appendDigit(digit);
-            postfix = fetchPostfix();
-            if (postfix != null)
-                return postfix.transform(combineSignAndResult(), numberContext.getContent());
         }
         return combineSignAndResult();
     }
 
-    private Postfix<T> fetchPostfix() {
+    private boolean endsWithPostfix() {
+        return postfix != null && numberContext.leftChar(postfix.getPostfixLength() - 1);
+    }
+
+    private Postfix<T> fetchPostfix(Postfix<T>[] postfixes) {
         for (Postfix<T> postfix : postfixes) {
-            if (postfix.matches(this))
+            if (postfix.matches(numberContext))
                 return postfix;
         }
         return null;
@@ -190,18 +189,20 @@ class Postfix<N extends Number & Comparable<N>> {
     private final N minValue;
     private final Function<N, Number> convertor;
     private final String postfixUpperCase;
+    private final int length;
 
     public Postfix(String postfix, N maxValue, N minValue, Function<N, Number> convertor) {
         this.postfix = postfix.toLowerCase();
+        postfixUpperCase = this.postfix.toUpperCase();
+        length = postfix.length();
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.convertor = convertor;
-        postfixUpperCase = this.postfix.toUpperCase();
     }
 
-    public Number transform(N value, String content) {
+    public Number transform(N value, NumberContext numberContext) {
         if (isOverflow(value))
-            throw new NumberOverflowException(content);
+            throw new NumberOverflowException(numberContext.getContent());
         return convertor.apply(value);
     }
 
@@ -209,8 +210,13 @@ class Postfix<N extends Number & Comparable<N>> {
         return value.compareTo(maxValue) > 0 || value.compareTo(minValue) < 0;
     }
 
-    public boolean matches(Parser<N, ?> parser) {
-        return parser.numberContext.endsWith(postfix) || parser.numberContext.endsWith(postfixUpperCase);
+    public boolean matches(NumberContext numberContext) {
+        return numberContext.getContent().endsWith(postfix)
+                || numberContext.getContent().endsWith(postfixUpperCase);
+    }
+
+    public int getPostfixLength() {
+        return length;
     }
 
     static class OverflowPostfix<N extends Number & Comparable<N>> extends Postfix<N> {

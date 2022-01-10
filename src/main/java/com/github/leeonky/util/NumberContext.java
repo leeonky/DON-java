@@ -8,9 +8,11 @@ class NumberContext {
     private final String content;
     private final int sign;
     private final int radix;
+    private final int length;
 
     public NumberContext(String code) {
         content = code;
+        length = content.length();
         sign = parseSign();
         radix = parseRadix();
     }
@@ -140,7 +142,7 @@ class NumberContext {
         return content;
     }
 
-    public boolean endsWith(String postfix) {
-        return currentIndex == content.length() - postfix.length() && content.endsWith(postfix);
+    public boolean leftChar(int length) {
+        return currentIndex == this.length - length;
     }
 }
