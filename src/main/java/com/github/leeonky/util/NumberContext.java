@@ -31,9 +31,9 @@ class NumberContext {
         return 10;
     }
 
-    public Number tryParseDoubleOrDecimal(Object currentNumber, char c) {
+    public Number tryParseDoubleOrDecimal(Object currentNumber, char c, Postfix<?> postfix) {
         if (isDot(c))
-            return parseDoubleWithDot(String.valueOf(currentNumber));
+            return parseDoubleWithDot(String.valueOf(currentNumber), postfix);
         if (isPowerChar(c))
             return parseDoubleWithPower(String.valueOf(currentNumber), getSign());
         return null;
@@ -65,7 +65,7 @@ class NumberContext {
                 return null;
             stringBuilder.append(c);
         }
-        return toDoubleOrBigDecimal(sign, stringBuilder.toString());
+        return toDoubleOrBigDecimal(sign, stringBuilder.toString(), null);
     }
 
     private StringBuilder createStringBuffer(String firstPart) {
@@ -76,7 +76,10 @@ class NumberContext {
         return stringBuilder;
     }
 
-    private Number toDoubleOrBigDecimal(int sign, String content) {
+    private Number toDoubleOrBigDecimal(int sign, String content, Postfix<?> postfix) {
+        if (postfix != null) {
+            return postfix.transformFloat(sign, content, this);
+        }
         double value = Double.parseDouble(content);
         if (Double.isInfinite(value))
             return sign == 1 ? new BigDecimal(content).negate() : new BigDecimal(content);
@@ -88,7 +91,7 @@ class NumberContext {
         return c > '9' || c < '0';
     }
 
-    private Number parseDoubleWithDot(String firstPart) {
+    private Number parseDoubleWithDot(String firstPart, Postfix<?> postfix) {
         StringBuilder stringBuilder = createStringBuffer(firstPart);
         stringBuilder.append('.');
         for (char c : leftChars()) {
@@ -97,8 +100,10 @@ class NumberContext {
             if (notDigit(c))
                 return null;
             stringBuilder.append(c);
+            if (isPostfixPosition(postfix))
+                break;
         }
-        return toDoubleOrBigDecimal(getSign(), stringBuilder.toString());
+        return toDoubleOrBigDecimal(getSign(), stringBuilder.toString(), postfix);
     }
 
     public boolean atTheEnd() {
@@ -144,5 +149,9 @@ class NumberContext {
 
     public boolean leftChar(int length) {
         return currentIndex == this.length - length;
+    }
+
+    boolean isPostfixPosition(Postfix<?> postfix) {
+        return postfix != null && leftChar(postfix.getPostfixLength());
     }
 }

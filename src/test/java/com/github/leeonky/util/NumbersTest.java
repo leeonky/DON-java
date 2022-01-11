@@ -239,17 +239,6 @@ class NumbersTest {
             }
 
             @Test
-            void dot_should_between_number() {
-                assertParse("1.", null);
-                assertParse("-.5", null);
-                assertParse(".5", null);
-                assertParse("1.n", null);
-                assertParse(".", null);
-                assertParse("0.", null);
-                assertParse(".0", null);
-            }
-
-            @Test
             void invalid_double() {
                 assertParse("0x1.5", null);
                 assertParse("1.1_", null);
@@ -371,6 +360,19 @@ class NumbersTest {
             assertParse("0.1E5", 0.1E5);
             assertParse("0.12E5", 0.12E5);
             assertParse("13.24E5", 13.24E5);
+        }
+
+        @Test
+        void dot_should_between_number() {
+            assertParse("1.", null);
+            assertParse("-.5", null);
+            assertParse(".5", null);
+            assertParse("1.n", null);
+            assertParse(".", null);
+            assertParse("0.", null);
+            assertParse(".0", null);
+            assertParse("0.y", null);
+            assertParse("0.f", null);
         }
 
         @Test
@@ -583,6 +585,63 @@ class NumbersTest {
                 assertParse("9223372036854775808d", 9223372036854775808d);
                 assertParse("-9223372036854775808d", -9223372036854775808d);
             }
+        }
+
+        @Nested
+        class DotFloatParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0.0y");
+                assertParseOverflow("2147483648.0y");
+                assertParseOverflow("9223372036854775808.0y");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0.0s");
+                assertParseOverflow("2147483648.0s");
+                assertParseOverflow("9223372036854775808.0s");
+            }
+
+            @Test
+            void as_long() {
+                assertParseOverflow("0.0l");
+                assertParseOverflow("2147483648.0l");
+                assertParseOverflow("9223372036854775808.0l");
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParseOverflow("0.0bi");
+                assertParseOverflow("2147483648.0bi");
+                assertParseOverflow("9223372036854775808.0bi");
+            }
+
+            @Test
+            void as_big_decimal() {
+                assertParse("0.0bd", new BigDecimal("0.0"));
+                assertParse("2147483648.0bd", new BigDecimal("2147483648.0"));
+                assertParse("9223372036854775808.0bd", new BigDecimal("9223372036854775808.0"));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("0f", 0.0f);
+                assertParse("2147483648.0f", 2147483648.0f);
+                assertParse("9223372036854775808.0f", 9223372036854775808.0f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("0d", 0.0d);
+                assertParse("2147483648.0d", 2147483648.0d);
+                assertParse("9223372036854775808.0d", 9223372036854775808.0d);
+            }
+        }
+
+        @Nested
+        class PowerFloatParser {
         }
     }
 
