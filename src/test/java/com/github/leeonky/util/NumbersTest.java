@@ -593,7 +593,6 @@ class NumbersTest {
     }
 }
 
-// TODO postfix all to postfix fF
 // TODO double parser postfix
 // TODO BigDecimal intently
 // TODO 0B
