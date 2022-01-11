@@ -269,10 +269,17 @@ class Postfix<N extends Number & Comparable<N>> {
         public Number transformFloat(int sign, String content, NumberContext numberContext) {
             if (BigDecimal.class.equals(type))
                 return sign == 1 ? new BigDecimal(content).negate() : new BigDecimal(content);
-            else if (Double.class.equals(type))
-                return sign == 1 ? -Double.parseDouble(content) : Double.parseDouble(content);
-            else if (Float.class.equals(type))
-                return sign == 1 ? -Float.parseFloat(content) : Float.parseFloat(content);
+            else if (Double.class.equals(type)) {
+                double d = sign == 1 ? -Double.parseDouble(content) : Double.parseDouble(content);
+                if (Double.isInfinite(d))
+                    throw new NumberOverflowException(numberContext.getContent());
+                return d;
+            } else if (Float.class.equals(type)) {
+                float f = sign == 1 ? -Float.parseFloat(content) : Float.parseFloat(content);
+                if (Float.isInfinite(f))
+                    throw new NumberOverflowException(numberContext.getContent());
+                return f;
+            }
             return super.transformFloat(sign, content, numberContext);
         }
     }

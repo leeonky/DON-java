@@ -692,6 +692,12 @@ class NumbersTest {
                 assertParse("2147483648e0d", 2147483648e0d);
                 assertParse("9223372036854775808e0d", 9223372036854775808e0d);
             }
+
+            @Test
+            void overflow() {
+                assertParseOverflow("1E200f");
+                assertParseOverflow("1E400d");
+            }
         }
     }
 
@@ -701,6 +707,5 @@ class NumbersTest {
     }
 }
 
-// double float postfix overflow
 // TODO 0B
 // TODO configurable radix postfix
