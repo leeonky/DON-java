@@ -1,5 +1,6 @@
 package com.github.leeonky.util;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -21,19 +22,21 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
     protected final NumberContext numberContext;
     protected T number;
     protected final Supplier<Parser<O, ?>> overflowParser;
-    private final Postfix<T> postfix;
+    private final Postfix<T>[] postfixes;
 
     public Parser(NumberContext numberContext, Supplier<Parser<O, ?>> overflowParser, Postfix<T>[] postfixes) {
         this.numberContext = numberContext;
         this.overflowParser = overflowParser;
-        postfix = fetchPostfix(postfixes);
+        this.postfixes = postfixes;
     }
 
     public Number parse(T base) {
+        Postfix<T> postfix = fetchPostfix(postfixes);
         number = base;
+        Number overflowNumber = overflowPostfix(postfix);
+        if (overflowNumber != null)
+            return overflowNumber;
         for (char c : numberContext.leftChars()) {
-            if (endsWithPostfix())
-                return postfix.transform(combineSignAndResult(), numberContext);
             Number doubleDecimal = numberContext.tryParseDoubleOrDecimal(number, c);
             if (doubleDecimal != null)
                 return doubleDecimal;
@@ -43,12 +46,20 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
             if (isOverflow(digit))
                 return overflowParser.get().parse(appendOverflowDigit(digit));
             appendDigit(digit);
+            if (isPostfixPosition(postfix))
+                return postfix.transform(combineSignAndResult(), numberContext);
         }
         return combineSignAndResult();
     }
 
-    private boolean endsWithPostfix() {
-        return postfix != null && numberContext.leftChar(postfix.getPostfixLength() - 1);
+    private boolean isPostfixPosition(Postfix<T> postfix) {
+        return postfix != null && numberContext.leftChar(postfix.getPostfixLength());
+    }
+
+    protected Number overflowPostfix(Postfix<T> postfix) {
+        if (isPostfixPosition(postfix))
+            return postfix.transform(combineSignAndResult(), numberContext);
+        return null;
     }
 
     private Postfix<T> fetchPostfix(Postfix<T>[] postfixes) {
@@ -77,7 +88,26 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
                     protected boolean isOverflow(BigInteger value) {
                         return false;
                     }
-                }};
+                },
+                new Postfix<BigInteger>("bd", null, null, BigDecimal::new) {
+                    @Override
+                    protected boolean isOverflow(BigInteger value) {
+                        return false;
+                    }
+                },
+                new DecimalPostfix<BigInteger>("f", null, null, Number::floatValue) {
+                    @Override
+                    protected boolean isOverflow(BigInteger value) {
+                        return false;
+                    }
+                },
+                new DecimalPostfix<BigInteger>("d", null, null, Number::doubleValue) {
+                    @Override
+                    protected boolean isOverflow(BigInteger value) {
+                        return false;
+                    }
+                }
+        };
         private final BigInteger radixBigInteger;
 
         @SuppressWarnings("unchecked")
@@ -112,7 +142,11 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
                 new Postfix<>("y", (int) Byte.MAX_VALUE, (int) Byte.MIN_VALUE, Integer::byteValue),
                 new Postfix<>("s", (int) Short.MAX_VALUE, (int) Short.MIN_VALUE, Integer::shortValue),
                 new Postfix<>("l", Integer.MAX_VALUE, Integer.MIN_VALUE, Integer::longValue),
-                new Postfix<Integer>("bi", Integer.MAX_VALUE, Integer.MIN_VALUE, BigInteger::valueOf)};
+                new Postfix<Integer>("bi", Integer.MAX_VALUE, Integer.MIN_VALUE, BigInteger::valueOf),
+                new DecimalPostfix<>("bd", Integer.MAX_VALUE, Integer.MIN_VALUE, BigDecimal::valueOf),
+                new DecimalPostfix<>("f", Integer.MAX_VALUE, Integer.MIN_VALUE, v -> (float) v),
+                new DecimalPostfix<>("d", Integer.MAX_VALUE, Integer.MIN_VALUE, v -> (double) v)
+        };
         private final int limit;
         private final int limitBeforeMul;
 
@@ -143,6 +177,11 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
         public boolean isOverflow(int digit) {
             return number < limitBeforeMul || number * numberContext.getRadix() < limit + digit;
         }
+
+        @Override
+        protected Number overflowPostfix(Postfix<Integer> postfix) {
+            return null;
+        }
     }
 
     static class LongParser extends Parser<Long, BigInteger> {
@@ -150,7 +189,10 @@ abstract class Parser<T extends Number & Comparable<T>, O extends Number & Compa
                 new Postfix.OverflowPostfix<>("y"),
                 new Postfix.OverflowPostfix<>("s"),
                 new Postfix<>("l", Long.MAX_VALUE, Long.MIN_VALUE, Long::longValue),
-                new Postfix<>("bi", Long.MAX_VALUE, Long.MIN_VALUE, BigInteger::valueOf)};
+                new Postfix<>("bi", Long.MAX_VALUE, Long.MIN_VALUE, BigInteger::valueOf),
+                new Postfix<>("bd", Long.MAX_VALUE, Long.MIN_VALUE, BigDecimal::valueOf),
+                new DecimalPostfix<>("f", Long.MAX_VALUE, Long.MIN_VALUE, v -> (float) v),
+                new DecimalPostfix<>("d", Long.MAX_VALUE, Long.MIN_VALUE, v -> (double) v)};
         private final long limit;
         private final long limitBeforeMul;
 
@@ -228,5 +270,17 @@ class Postfix<N extends Number & Comparable<N>> {
         protected boolean isOverflow(N value) {
             return true;
         }
+    }
+}
+
+class DecimalPostfix<N extends Number & Comparable<N>> extends Postfix<N> {
+
+    public DecimalPostfix(String postfix, N maxValue, N minValue, Function<N, Number> convertor) {
+        super(postfix, maxValue, minValue, convertor);
+    }
+
+    @Override
+    public boolean matches(NumberContext numberContext) {
+        return numberContext.getRadix() == 10 && super.matches(numberContext);
     }
 }
