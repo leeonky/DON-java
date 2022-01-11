@@ -35,7 +35,7 @@ class NumberContext {
         if (isDot(c))
             return parseDoubleWithDot(String.valueOf(currentNumber), postfix);
         if (isPowerChar(c))
-            return parseDoubleWithPower(String.valueOf(currentNumber), getSign());
+            return parseDoubleWithPower(String.valueOf(currentNumber), getSign(), postfix);
         return null;
     }
 
@@ -55,7 +55,7 @@ class NumberContext {
         return (c == 'e' || c == 'E') && getRadix() == 10 && afterDigit() && !atTheEnd();
     }
 
-    private Number parseDoubleWithPower(String firstPart, int sign) {
+    private Number parseDoubleWithPower(String firstPart, int sign, Postfix<?> postfix) {
         StringBuilder stringBuilder = createStringBuffer(firstPart);
         stringBuilder.append('E');
         if (parseSign() == -1)
@@ -64,8 +64,10 @@ class NumberContext {
             if (notDigit(c))
                 return null;
             stringBuilder.append(c);
+            if (isPostfixPosition(postfix))
+                break;
         }
-        return toDoubleOrBigDecimal(sign, stringBuilder.toString(), null);
+        return toDoubleOrBigDecimal(sign, stringBuilder.toString(), postfix);
     }
 
     private StringBuilder createStringBuffer(String firstPart) {
@@ -96,7 +98,7 @@ class NumberContext {
         stringBuilder.append('.');
         for (char c : leftChars()) {
             if (isPowerChar(c))
-                return parseDoubleWithPower(stringBuilder.toString(), getSign());
+                return parseDoubleWithPower(stringBuilder.toString(), getSign(), postfix);
             if (notDigit(c))
                 return null;
             stringBuilder.append(c);

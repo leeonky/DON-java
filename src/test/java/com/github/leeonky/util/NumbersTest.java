@@ -384,6 +384,7 @@ class NumbersTest {
             assertParse(".e", null);
             assertParse("0ex", null);
             assertParse("0E.0", null);
+            assertParse("0Ed", null);
         }
     }
 
@@ -627,14 +628,14 @@ class NumbersTest {
 
             @Test
             void as_float() {
-                assertParse("0f", 0.0f);
+                assertParse("0.0f", 0.0f);
                 assertParse("2147483648.0f", 2147483648.0f);
                 assertParse("9223372036854775808.0f", 9223372036854775808.0f);
             }
 
             @Test
             void as_double() {
-                assertParse("0d", 0.0d);
+                assertParse("0.0d", 0.0d);
                 assertParse("2147483648.0d", 2147483648.0d);
                 assertParse("9223372036854775808.0d", 9223372036854775808.0d);
             }
@@ -642,17 +643,64 @@ class NumbersTest {
 
         @Nested
         class PowerFloatParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0e0y");
+                assertParseOverflow("2147483648e0y");
+                assertParseOverflow("9223372036854775808e0y");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0e0s");
+                assertParseOverflow("2147483648e0s");
+                assertParseOverflow("9223372036854775808e0s");
+            }
+
+            @Test
+            void as_long() {
+                assertParseOverflow("0e0l");
+                assertParseOverflow("2147483648e0l");
+                assertParseOverflow("9223372036854775808e0l");
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParseOverflow("0e0bi");
+                assertParseOverflow("2147483648e0bi");
+                assertParseOverflow("9223372036854775808e0bi");
+            }
+
+            @Test
+            void as_big_decimal() {
+                assertParse("0e0bd", new BigDecimal("0e0"));
+                assertParse("2147483648e0bd", new BigDecimal("2147483648e0"));
+                assertParse("9223372036854775808e0bd", new BigDecimal("9223372036854775808e0"));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("0e0f", 0e0f);
+                assertParse("2147483648e0f", 2147483648e0f);
+                assertParse("9223372036854775808e0f", 9223372036854775808e0f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("0e0d", 0e0d);
+                assertParse("2147483648e0d", 2147483648e0d);
+                assertParse("9223372036854775808e0d", 9223372036854775808e0d);
+            }
         }
     }
 
     private void assertParseOverflow(String code) {
         assertThat(assertThrows(NumberOverflowException.class, () -> parseNumber(code)))
                 .hasMessageContaining(String.format("Cannon save [%s] with the given postfix type", code));
-
     }
 }
 
-// TODO double parser postfix
-// TODO BigDecimal intently
+// double float postfix overflow
 // TODO 0B
 // TODO configurable radix postfix
