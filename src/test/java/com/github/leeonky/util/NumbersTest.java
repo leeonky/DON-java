@@ -699,6 +699,17 @@ class NumbersTest {
                 assertParseOverflow("1E400d");
             }
         }
+
+        @Test
+        void invalid_postfix_number() {
+            assertParse("1_y", null);
+            assertParse("1_s", null);
+            assertParse("1_L", null);
+            assertParse("1_d", null);
+            assertParse("1_f", null);
+            assertParse("1_bd", null);
+            assertParse("1_bi", null);
+        }
     }
 
     private void assertParseOverflow(String code) {
