@@ -16,9 +16,43 @@ public class NumberParser {
 
         @Override
         public Number convert(long number, String content) {
+            if (number > Byte.MAX_VALUE || number < Byte.MIN_VALUE)
+                throw new NumberOverflowException(content);
+            return (short) number;
+        }
+
+        @Override
+        public Number convert(BigInteger number, String content) {
+            throw new NumberOverflowException(content);
+        }
+    }, SHORT_POSTFIX = new NumberPostfix(1) {
+        @Override
+        public Number convert(int number, String content) {
             if (number > Short.MAX_VALUE || number < Short.MIN_VALUE)
                 throw new NumberOverflowException(content);
             return (short) number;
+        }
+
+        @Override
+        public Number convert(long number, String content) {
+            if (number > Short.MAX_VALUE || number < Short.MIN_VALUE)
+                throw new NumberOverflowException(content);
+            return (short) number;
+        }
+
+        @Override
+        public Number convert(BigInteger number, String content) {
+            throw new NumberOverflowException(content);
+        }
+    }, LONG_POSTFIX = new NumberPostfix(1) {
+        @Override
+        public Number convert(int number, String content) {
+            return (long) number;
+        }
+
+        @Override
+        public Number convert(long number, String content) {
+            return number;
         }
 
         @Override
@@ -74,6 +108,14 @@ public class NumberParser {
             case 'y':
             case 'Y':
                 postfix = BYTE_POSTFIX;
+                break;
+            case 's':
+            case 'S':
+                postfix = SHORT_POSTFIX;
+                break;
+            case 'l':
+            case 'L':
+                postfix = LONG_POSTFIX;
                 break;
         }
         if (postfix != null && index == (length -= postfix.getLength()))

@@ -465,24 +465,24 @@ class NumbersTest {
 
             @Test
             void as_short() {
-//                assertParse("0s", (short) 0);
-//                assertParse("1s", (short) 1);
-//                assertParse("-1s", (short) -1);
-//                assertParse("-0x8000s", (short) -32768);
-//                assertParse("0x7fffs", (short) 32767);
-//
-//                assertParseOverflow("32768s");
-//                assertParseOverflow("-32769s");
-//            }
-//
-//            @Test
-//            void as_long() {
-//                assertParse("0l", 0L);
-//                assertParse("1l", 1L);
-//                assertParse("-1l", -1L);
-//                assertParse("-0x8000_0000l", -2147483648L);
-//                assertParse("0x7fff_ffffl", 2147483647L);
-//            }
+                assertParse("0s", (short) 0);
+                assertParse("1s", (short) 1);
+                assertParse("-1s", (short) -1);
+                assertParse("-0x8000s", (short) -32768);
+                assertParse("0x7fffs", (short) 32767);
+
+                assertParseOverflow("32768s");
+                assertParseOverflow("-32769s");
+            }
+
+            @Test
+            void as_long() {
+                assertParse("0l", 0L);
+                assertParse("1l", 1L);
+                assertParse("-1l", -1L);
+                assertParse("-0x8000_0000l", -2147483648L);
+                assertParse("0x7fff_ffffl", 2147483647L);
+            }
 //
 //            @Test
 //            void as_big_integer() {
@@ -511,33 +511,33 @@ class NumbersTest {
 //                assertParse("1d", 1.0);
 //                assertParse("-1d", -1.0);
 //            }
+        }
+
+        //
+        @Nested
+        class LongParse {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0xffff_ffff_ffy");
+                assertParseOverflow("-0xffff_ffff_ffy");
             }
 
-            //
-            @Nested
-            class LongParse {
+            @Test
+            void as_short() {
+                assertParseOverflow("0xffff_ffff_ffs");
+                assertParseOverflow("-0xffff_ffff_ffs");
+            }
 
-                @Test
-                void as_byte() {
-                    assertParseOverflow("0xffff_ffff_ffy");
-                    assertParseOverflow("-0xffff_ffff_ffy");
-                }
-//
-//            @Test
-//            void as_short() {
-//                assertParseOverflow("0xffff_ffff_ffs");
-//                assertParseOverflow("-0xffff_ffff_ffs");
-//            }
-//
-//            @Test
-//            void as_long() {
-//                assertParse("-0x8000_0001l", -2147483649L);
-//                assertParse("0x8000_0000l", 2147483648L);
-//
-//                assertParse("-0x8000_0000_0000_0000l", 0x8000_0000_0000_0000L);
-//                assertParse("0x7fff_ffff_ffff_ffff", 0x7fff_ffff_ffff_ffffL);
-//            }
-//
+            @Test
+            void as_long() {
+                assertParse("-0x8000_0001l", -2147483649L);
+                assertParse("0x8000_0000l", 2147483648L);
+
+                assertParse("-0x8000_0000_0000_0000l", 0x8000_0000_0000_0000L);
+                assertParse("0x7fff_ffff_ffff_ffff", 0x7fff_ffff_ffff_ffffL);
+            }
+
 //            @Test
 //            void as_big_integer() {
 //                assertParse("0xffff_ffff_ffbi", new BigInteger("ffffffffff", 16));
@@ -561,29 +561,29 @@ class NumbersTest {
 //                assertParse("2147483648d", 2147483648d);
 //                assertParse("-2147483648d", -2147483648d);
 //            }
+        }
+
+        //
+        @Nested
+        class BigIntegerParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0x8000_0000_0000_0000y");
+                assertParseOverflow("-0x8000_0000_0000_0001y");
             }
 
-            //
-            @Nested
-            class BigIntegerParser {
+            @Test
+            void as_short() {
+                assertParseOverflow("0x8000_0000_0000_0000s");
+                assertParseOverflow("-0x8000_0000_0000_0001s");
+            }
 
-                @Test
-                void as_byte() {
-                    assertParseOverflow("0x8000_0000_0000_0000y");
-                    assertParseOverflow("-0x8000_0000_0000_0001y");
-                }
-//
-//            @Test
-//            void as_short() {
-//                assertParseOverflow("0x8000_0000_0000_0000s");
-//                assertParseOverflow("-0x8000_0000_0000_0001s");
-//            }
-//
-//            @Test
-//            void as_long() {
-//                assertParseOverflow("0x8000_0000_0000_0000l");
-//                assertParseOverflow("-0x8000_0000_0000_0001l");
-//            }
+            @Test
+            void as_long() {
+                assertParseOverflow("0x8000_0000_0000_0000l");
+                assertParseOverflow("-0x8000_0000_0000_0001l");
+            }
 //
 //            @Test
 //            void as_big_integer() {
@@ -608,8 +608,9 @@ class NumbersTest {
 //                assertParse("9223372036854775808d", 9223372036854775808d);
 //                assertParse("-9223372036854775808d", -9223372036854775808d);
 //            }
-            }
-//
+        }
+
+        //
 //        @Nested
 //        class DotFloatParser {
 //
@@ -722,16 +723,15 @@ class NumbersTest {
 //            }
 //        }
 //
-//        @Test
-//        void invalid_postfix_number() {
-//            assertParse("1_y", null);
-//            assertParse("1_s", null);
-//            assertParse("1_L", null);
-//            assertParse("1_d", null);
-//            assertParse("1_f", null);
-//            assertParse("1_bd", null);
-//            assertParse("1_bi", null);
-//        }
+        @Test
+        void invalid_postfix_number() {
+            assertParse("1_y", null);
+            assertParse("1_s", null);
+            assertParse("1_L", null);
+            assertParse("1_d", null);
+            assertParse("1_f", null);
+            assertParse("1_bd", null);
+            assertParse("1_bi", null);
         }
     }
 
