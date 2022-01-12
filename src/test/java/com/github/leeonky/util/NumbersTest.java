@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 
 import static com.github.leeonky.util.Numbers.parseNumber;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +23,14 @@ class NumbersTest {
             void parse_int_number() {
                 assertParse("0", 0);
                 assertParse("1", 1);
+                assertParse("2", 2);
+                assertParse("3", 3);
+                assertParse("4", 4);
+                assertParse("5", 5);
+                assertParse("6", 6);
+                assertParse("7", 7);
+                assertParse("8", 8);
+                assertParse("9", 9);
                 assertParse("24", 24);
                 assertParse("1_000", 1_000);
                 assertParse("+24", 24);
@@ -74,6 +83,20 @@ class NumbersTest {
             @Test
             void parse_int_number() {
                 assertParse("0x0", 0);
+                assertParse("0x1", 1);
+                assertParse("0x2", 2);
+                assertParse("0x3", 3);
+                assertParse("0x4", 4);
+                assertParse("0x5", 5);
+                assertParse("0x6", 6);
+                assertParse("0x7", 7);
+                assertParse("0x8", 8);
+                assertParse("0x9", 9);
+                assertParse("0xa", 0xa);
+                assertParse("0xb", 0xb);
+                assertParse("0xc", 0xc);
+                assertParse("0xd", 0xd);
+                assertParse("0xe", 0xe);
                 assertParse("0xf", 0xf);
                 assertParse("0XF", 0XF);
                 assertParse("0xd", 0xd);
@@ -244,30 +267,31 @@ class NumbersTest {
                 assertParse("0x1.5", null);
                 assertParse("1.1_", null);
             }
-//
-//            @Test
-//            void power_number_in_integer() {
-//                assertParse("10E05", 10E5);
-//                assertParse("10E1_5", 10E1_5);
-//                assertParse("10E15", 10E15);
-//                assertParse("10E-5", 10E-5);
-//                assertParse("10E+5", 10E5);
-//                assertParse("0E5", 0E5);
-//                assertParse("-0E5", -0E5);
-//
-//            }
-//
-//            @Test
-//            void invalid_power_number() {
-//                assertParse("10E0.5", null);
-//                assertParse("10E5_", null);
-//                assertParse("10E0xF", null);
-//                assertParse("10Ea", null);
-//                assertParse("e1", null);
-//                assertParse("-e1", null);
-//                assertParse("0x1E1", 0x1E1);
-//                assertParse("10E", null);
-//            }
+
+            @Test
+            void power_number_in_integer() {
+                assertParse("10E05", 10E5);
+                assertParse("10E1_5", 10E1_5);
+                assertParse("10E15", 10E15);
+                assertParse("10E-5", 10E-5);
+                assertParse("10E+5", 10E5);
+                assertParse("0E5", 0E5);
+                assertParse("-0E5", -0E5);
+
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("10E0.5", null);
+                assertParse("10E5_", null);
+                assertParse("10E_5", null);
+                assertParse("10E0xF", null);
+                assertParse("10Ea", null);
+                assertParse("e1", null);
+                assertParse("-e1", null);
+                assertParse("0x1E1", 0x1E1);
+                assertParse("10E", null);
+            }
         }
 
         @Nested
@@ -291,26 +315,26 @@ class NumbersTest {
                 assertParse("0x2147483648.5", null);
                 assertParse("2147483648.1_", null);
             }
-//
-//            @Test
-//            void power_number_in_integer() {
-//                assertParse("2147483648E05", 2147483648E5);
-//                assertParse("2147483648E1_5", 2147483648E1_5);
-//                assertParse("2147483648E15", 2147483648E15);
-//                assertParse("2147483648E-5", 2147483648E-5);
-//                assertParse("2147483648E+5", 2147483648E5);
-//
-//            }
-//
-//            @Test
-//            void invalid_power_number() {
-//                assertParse("2147483648E0.5", null);
-//                assertParse("2147483648E5_", null);
-//                assertParse("2147483648E0xF", null);
-//                assertParse("2147483648EA", null);
-//                assertParse("0x8FFFFFFFE1", 0x8FFFFFFFE1L);
-//                assertParse("2147483648E", null);
-//            }
+
+            @Test
+            void power_number_in_integer() {
+                assertParse("2147483648E05", 2147483648E5);
+                assertParse("2147483648E1_5", 2147483648E1_5);
+                assertParse("2147483648E15", 2147483648E15);
+                assertParse("2147483648E-5", 2147483648E-5);
+                assertParse("2147483648E+5", 2147483648E5);
+
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("2147483648E0.5", null);
+                assertParse("2147483648E5_", null);
+                assertParse("2147483648E0xF", null);
+                assertParse("2147483648EA", null);
+                assertParse("0x8FFFFFFFE1", 0x8FFFFFFFE1L);
+                assertParse("2147483648E", null);
+            }
         }
 
         @Nested
@@ -335,58 +359,58 @@ class NumbersTest {
                 assertParse("100000000000000000015.1_", null);
             }
 
-//            @Test
-//            void power_number_in_integer() {
-//                assertParse("100000000000000000015E05", 100000000000000000015E5);
-//                assertParse("100000000000000000015E1_5", 100000000000000000015E1_5);
-//                assertParse("100000000000000000015E15", 100000000000000000015E15);
-//                assertParse("100000000000000000015E-5", 100000000000000000015E-5);
-//                assertParse("100000000000000000015E+5", 100000000000000000015E5);
-//
-//            }
-//
-//            @Test
-//            void invalid_power_number() {
-//                assertParse("100000000000000000015E0.5", null);
-//                assertParse("100000000000000000015E5_", null);
-//                assertParse("100000000000000000015E0xF", null);
-//                assertParse("100000000000000000015EA", null);
-//                assertParse("0x100000000000000000015EA", new BigInteger("100000000000000000015EA", 16));
-//                assertParse("100000000000000000015E", null);
-//            }
+            @Test
+            void power_number_in_integer() {
+                assertParse("100000000000000000015E05", 100000000000000000015E5);
+                assertParse("100000000000000000015E1_5", 100000000000000000015E1_5);
+                assertParse("100000000000000000015E15", 100000000000000000015E15);
+                assertParse("100000000000000000015E-5", 100000000000000000015E-5);
+                assertParse("100000000000000000015E+5", 100000000000000000015E5);
+
+            }
+
+            @Test
+            void invalid_power_number() {
+                assertParse("100000000000000000015E0.5", null);
+                assertParse("100000000000000000015E5_", null);
+                assertParse("100000000000000000015E0xF", null);
+                assertParse("100000000000000000015EA", null);
+                assertParse("0x100000000000000000015EA", new BigInteger("100000000000000000015EA", 16));
+                assertParse("100000000000000000015E", null);
+            }
         }
-//
-//        @Test
-//        void power_number_in_double() {
-//            assertParse("0.1E5", 0.1E5);
-//            assertParse("0.12E5", 0.12E5);
-//            assertParse("13.24E5", 13.24E5);
-//        }
-//
-//        @Test
-//        void dot_should_between_number() {
-//            assertParse("1.", null);
-//            assertParse("-.5", null);
-//            assertParse(".5", null);
-//            assertParse("1.n", null);
-//            assertParse(".", null);
-//            assertParse("0.", null);
-//            assertParse(".0", null);
-//            assertParse("0.y", null);
-//            assertParse("0.f", null);
-//        }
-//
-//        @Test
-//        void power_char_should_between_number() {
-//            assertParse(".E0", null);
-//            assertParse(".e0", null);
-//            assertParse("0E", null);
-//            assertParse("0e", null);
-//            assertParse(".e", null);
-//            assertParse("0ex", null);
-//            assertParse("0E.0", null);
-//            assertParse("0Ed", null);
-//        }
+
+        @Test
+        void power_number_in_double() {
+            assertParse("0.1E5", 0.1E5);
+            assertParse("0.12E5", 0.12E5);
+            assertParse("13.24E5", 13.24E5);
+        }
+
+        @Test
+        void dot_should_between_number() {
+            assertParse("1.", null);
+            assertParse("-.5", null);
+            assertParse(".5", null);
+            assertParse("1.n", null);
+            assertParse(".", null);
+            assertParse("0.", null);
+            assertParse(".0", null);
+            assertParse("0.y", null);
+            assertParse("0.f", null);
+        }
+
+        @Test
+        void power_char_should_between_number() {
+            assertParse(".E0", null);
+            assertParse(".e0", null);
+            assertParse("0E", null);
+            assertParse("0e", null);
+            assertParse(".e", null);
+            assertParse("0ex", null);
+            assertParse("0E.0", null);
+            assertParse("0Ed", null);
+        }
     }
 
     @Test
@@ -398,25 +422,25 @@ class NumbersTest {
         assertParse("notNumber", null);
     }
 
-    //
-//    @Nested
-//    class ParseBigDecimal {
-//
-//        @Test
-//        void to_big_decimal_with_huge_power() {
-//            assertParse("100E400", new BigDecimal("100E400"));
-//            assertParse("-100E400", new BigDecimal("-100E400"));
-//        }
-//
-//        @Test
-//        void long_float_to_big_decimal() {
-//            assertParse("1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("1.0E400"));
-//            assertParse("-1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("-1.0E400"));
-//        }
-//    }
-//
-//
-//    @Nested
+
+    @Nested
+    class ParseBigDecimal {
+
+        @Test
+        void to_big_decimal_with_huge_power() {
+            assertParse("100E400", new BigDecimal("100E400"));
+            assertParse("-100E400", new BigDecimal("-100E400"));
+        }
+
+        @Test
+        void long_float_to_big_decimal() {
+            assertParse("1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("1.0E400"));
+            assertParse("-1" + String.join("", Collections.nCopies(400, "0")) + ".0", new BigDecimal("-1.0E400"));
+        }
+    }
+
+
+    //    @Nested
 //    class Postfix {
 //
 //        @Nested

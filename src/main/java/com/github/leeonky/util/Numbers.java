@@ -35,30 +35,80 @@ public class Numbers {
         }
         int limit = sign == 1 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
         int limitBeforeMul = limit / radix;
-
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
-            if (isFloatDot(radix, c, index, length, content))
-                return parseDoubleWithDot(sign, number, radix, content, index, length);
             int digit = getDigit(radix, c);
-            if (digit < 0)
+            if (digit < 0) {
+                if (isFloatDot(radix, c, index, length, content))
+                    return parseDoubleWithDot(sign, number, radix, content, index, length);
+                if (isPowerChar(radix, c, index, length, content))
+                    return parseDoubleWithPower(sign, number, content, index, length);
                 return null;
-
-            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
-                return continueParseLong(sign, radix, number, digit, index, content, length);
             }
-
+            if (isOverflow(digit, number, limit, limitBeforeMul, radix))
+                return continueParseLong(sign, radix, number, digit, index, content, length);
             number = number * radix - digit;
         }
         return -number * sign;
     }
 
+    private static Number parseDoubleWithPower(int sign, Object number, String content, int index, int length) {
+        StringBuilder stringBuilder = new StringBuilder(content.length());
+        if (number.equals(0))
+            stringBuilder.append('-');
+        stringBuilder.append(number);
+        return parseDoubleWithPower(sign, content, index, length, stringBuilder);
+    }
+
+    private static Number parseDoubleWithPower(int sign, String content, int index, int length, StringBuilder stringBuilder) {
+        stringBuilder.append('E');
+        int eSign = 1;
+        if (content.charAt(index) == '+') {
+            if (++index == length)
+                return null;
+        }
+        if (content.charAt(index) == '-') {
+            if (++index == length)
+                return null;
+            eSign = -1;
+        }
+        if (eSign == -1)
+            stringBuilder.append('-');
+        while (index < length) {
+            char c = content.charAt(index++);
+            if (c == '_' && index != length)
+                continue;
+            if (notDigit(c))
+                return null;
+            stringBuilder.append(c);
+        }
+        return toDoubleOrBigDecimal(sign, stringBuilder.toString());
+    }
+
+    private static boolean isPowerChar(int radix, char c, int index, int length, String content) {
+        return (c == 'e' || c == 'E') && radix == 10
+                && afterDigit(index, content) && beforeSignOrDigit(index, length, content);
+    }
+
+    private static boolean beforeSignOrDigit(int index, int length, String content) {
+        if (index >= length)
+            return false;
+        char c = content.charAt(index);
+        return (isDigit(c) || c == '-' || c == '+');
+    }
+
     private static boolean isFloatDot(int radix, char c, int index, int length, String content) {
-        return c == '.' && radix == 10
-                && index > 1 && isDigit(content.charAt(index - 2))
-                && index < length && isDigit(content.charAt(index));
+        return c == '.' && radix == 10 && afterDigit(index, content) && beforeDigit(index, length, content);
+    }
+
+    private static boolean beforeDigit(int index, int length, String content) {
+        return index < length && isDigit(content.charAt(index));
+    }
+
+    private static boolean afterDigit(int index, String content) {
+        return index > 1 && isDigit(content.charAt(index - 2));
     }
 
     private static boolean isDigit(char c) {
@@ -75,6 +125,8 @@ public class Numbers {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
+            if (isPowerChar(radix, c, index, length, content))
+                return parseDoubleWithPower(sign, content, index, length, stringBuilder);
             if (notDigit(c))
                 return null;
             stringBuilder.append(c);
@@ -86,8 +138,11 @@ public class Numbers {
         return c < '0' || c > '9';
     }
 
-    private static Number toDoubleOrBigDecimal(int sign, String toString) {
-        return Double.parseDouble(toString) * -sign;
+    private static Number toDoubleOrBigDecimal(int sign, String numberString) {
+        double d = Double.parseDouble(numberString);
+        if (Double.isInfinite(d))
+            return sign == 1 ? new BigDecimal(numberString).negate() : new BigDecimal(numberString);
+        return d * -sign;
     }
 
     private static Number continueParseLong(int sign, int radix, long number, int digit, int index, String content, int length) {
@@ -98,17 +153,18 @@ public class Numbers {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
-            if (isFloatDot(radix, c, index, length, content))
-                return parseDoubleWithDot(sign, number, radix, content, index, length);
             digit = getDigit(radix, c);
-            if (digit < 0)
+            if (digit < 0) {
+                if (isFloatDot(radix, c, index, length, content))
+                    return parseDoubleWithDot(sign, number, radix, content, index, length);
+                if (isPowerChar(radix, c, index, length, content))
+                    return parseDoubleWithPower(sign, number, content, index, length);
                 return null;
-            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
-                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content, length);
             }
+            if (isOverflow(digit, number, limit, limitBeforeMul, radix))
+                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content, length);
             number = number * radix - digit;
         }
-
         return -number * sign;
     }
 
@@ -119,12 +175,14 @@ public class Numbers {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
-            if (isFloatDot(radix, c, index, length, content))
-                return parseDoubleWithDot(sign, number, radix, content, index, length);
             digit = getDigit(radix, c);
-            if (digit < 0)
+            if (digit < 0) {
+                if (isFloatDot(radix, c, index, length, content))
+                    return parseDoubleWithDot(sign, number, radix, content, index, length);
+                if (isPowerChar(radix, c, index, length, content))
+                    return parseDoubleWithPower(sign, number, content, index, length);
                 return null;
-
+            }
             number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
         }
         return sign == 1 ? number.negate() : number;
@@ -141,9 +199,9 @@ public class Numbers {
     private static int getDigit(int radix, char c) {
         int value;
         if (radix > 10) {
-            if (c > 'a')
+            if (c >= 'a')
                 value = c - 'a' + 10;
-            else if (c > 'A')
+            else if (c >= 'A')
                 value = c - 'A' + 10;
             else
                 value = c - '0';
