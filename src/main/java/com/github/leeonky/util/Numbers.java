@@ -21,7 +21,7 @@ public class Numbers {
     private static Number parseFromInteger(String content) {
         int index = 0;
         int length = content.length();
-        int intNumber = 0;
+        int number = 0;
         int radix = 10;
         int sign = 1;
         if (content.charAt(index) == '+') {
@@ -38,6 +38,8 @@ public class Numbers {
                 return null;
             radix = 16;
         }
+        int limit = sign == 1 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
+        int limitBeforeMul = limit / radix;
 
         while (index < length) {
             char c = content.charAt(index++);
@@ -46,9 +48,41 @@ public class Numbers {
             int digit = getDigit(radix, c);
             if (digit < 0)
                 return null;
-            intNumber = intNumber * radix - digit;
+
+            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
+                return continueParseLong(sign, radix, number, digit, index, content);
+            }
+
+            number = number * radix - digit;
         }
-        return -intNumber * sign;
+        return -number * sign;
+    }
+
+    private static Number continueParseLong(int sign, int radix, long number, int digit, int index, String content) {
+        number = number * radix - digit;
+        int length = content.length();
+        long limit = sign == 1 ? -Long.MAX_VALUE : Long.MIN_VALUE;
+        long limitBeforeMul = limit / radix;
+        while (index < length) {
+            char c = content.charAt(index++);
+            if (c == '_' && index != length)
+                continue;
+            digit = getDigit(radix, c);
+            if (digit < 0)
+                return null;
+
+//            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
+//                return continueParseLong(sign, radix, number, digit, index, content);
+//            }
+
+            number = number * radix - digit;
+        }
+
+        return -number * sign;
+    }
+
+    private static boolean isOverflow(int digit, int number, int limit, int limitBeforeMul, int radix) {
+        return number < limitBeforeMul || number * radix < limit + digit;
     }
 
     private static int getDigit(int radix, char c) {

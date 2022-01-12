@@ -34,13 +34,13 @@ class NumbersTest {
                 assertParse("-2147483648", -2147483648);
             }
 
-//            @Test
-//            void over_flow() {
-//                assertParse("2147483648", 2147483648L);
-//                assertParse("2147483657", 2147483657L);
-//                assertParse("-2147483649", -2147483649L);
-//                assertParse("-2147483658", -2147483658L);
-//            }
+            @Test
+            void over_flow() {
+                assertParse("2147483648", 2147483648L);
+                assertParse("2147483657", 2147483657L);
+                assertParse("-2147483649", -2147483649L);
+                assertParse("-2147483658", -2147483658L);
+            }
 
             @Test
             void invalid_number() {
@@ -88,12 +88,12 @@ class NumbersTest {
                 assertParse("-0x80000000", -0x80000000);
             }
 
-            //            @Test
-//            void over_flow() {
-//                assertParse("0x80000000", 0x80000000L);
-//                assertParse("-0x80000001", -0x80000001L);
-//            }
-//
+            @Test
+            void over_flow() {
+                assertParse("0x80000000", 0x80000000L);
+                assertParse("-0x80000001", -0x80000001L);
+            }
+
             @Test
             void invalid_number() {
                 assertParse("0x", null);
@@ -105,26 +105,26 @@ class NumbersTest {
         }
     }
 
-    //    @Nested
-//    class ParseLong {
-//
-//        @Nested
-//        class Radix10 {
-//
-//            @Test
-//            void parse_long() {
-//                assertParse("100000000005", 100000000005L);
-//                assertParse("100000000005_000", 100000000005_000L);
-//                assertParse("9223372036854775807", 9223372036854775807L);
-//            }
-//
-//            @Test
-//            void negative() {
-//                assertParse("0x80000010", 0x80000010L);
-//                assertParse("-0x80000010", -0x80000010L);
-//                assertParse("-9223372036854775808", -9223372036854775808L);
-//            }
-//
+    @Nested
+    class ParseLong {
+
+        @Nested
+        class Radix10 {
+
+            @Test
+            void parse_long() {
+                assertParse("100000000005", 100000000005L);
+                assertParse("100000000005_000", 100000000005_000L);
+                assertParse("9223372036854775807", 9223372036854775807L);
+            }
+
+            @Test
+            void negative() {
+                assertParse("0x80000010", 0x80000010L);
+                assertParse("-0x80000010", -0x80000010L);
+                assertParse("-9223372036854775808", -9223372036854775808L);
+            }
+
 //            @Test
 //            void over_flow() {
 //                assertParse("9223372036854775808", new BigInteger("9223372036854775808"));
@@ -132,45 +132,46 @@ class NumbersTest {
 //                assertParse("-9223372036854775809", new BigInteger("-9223372036854775809"));
 //                assertParse("-9223372036854775811", new BigInteger("-9223372036854775811"));
 //            }
-//
-//            @Test
-//            void invalid_number() {
-//                assertParse("100000000005_", null);
-//                assertParse("100000000005xx", null);
-//            }
-//        }
-//
-//        @Nested
-//        class Radix16 {
-//
-//            @Test
-//            void parse_long() {
-//                assertParse("0xfffffffffff", 0xfffffffffffL);
-//                assertParse("0xfff_ffff_ffff", 0xfff_ffff_ffffL);
-//                assertParse("0x7fffffffffffffff", 9223372036854775807L);
-//            }
-//
-//            @Test
-//            void negative() {
-//                assertParse("0x80000010", 0x80000010L);
-//                assertParse("-0x80000010", -0x80000010L);
-//                assertParse("-0x8000000000000000", -9223372036854775808L);
-//            }
-//
+
+            @Test
+            void invalid_number() {
+                assertParse("100000000005_", null);
+                assertParse("100000000005xx", null);
+            }
+        }
+
+        @Nested
+        class Radix16 {
+
+            @Test
+            void parse_long() {
+                assertParse("0xfffffffffff", 0xfffffffffffL);
+                assertParse("0xfff_ffff_ffff", 0xfff_ffff_ffffL);
+                assertParse("0x7fffffffffffffff", 9223372036854775807L);
+            }
+
+            @Test
+            void negative() {
+                assertParse("0x80000010", 0x80000010L);
+                assertParse("-0x80000010", -0x80000010L);
+                assertParse("-0x8000000000000000", -9223372036854775808L);
+            }
+
 //            @Test
 //            void over_flow() {
 //                assertParse("0x8000000000000000", new BigInteger("9223372036854775808"));
 //                assertParse("-0x8000000000000001", new BigInteger("-9223372036854775809"));
 //            }
-//
-//            @Test
-//            void invalid_number() {
-//                assertParse("100000000005_", null);
-//                assertParse("100000000005xx", null);
-//            }
-//        }
-//    }
-//
+
+            @Test
+            void invalid_number() {
+                assertParse("100000000005_", null);
+                assertParse("100000000005xx", null);
+            }
+        }
+    }
+
+    //
 //    @Nested
 //    class ParseBigInteger {
 //
