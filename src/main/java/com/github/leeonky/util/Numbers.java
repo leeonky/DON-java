@@ -9,18 +9,13 @@ import static java.math.BigInteger.valueOf;
 
 public class Numbers {
     public static Number parseNumber(String content) {
-        if (content == null || content.length() == 0)
+        if (content == null) {
             return null;
-        return parseFromInteger(content);
-//        NumberContext numberContext = new NumberContext(content);
-//        if (numberContext.atTheEnd())
-//            return null;
-//        return new Parser.IntegerParser(numberContext).parse(0);
-    }
-
-    private static Number parseFromInteger(String content) {
-        int index = 0;
+        }
         int length = content.length();
+        if (length == 0)
+            return null;
+        int index = 0;
         int number = 0;
         int radix = 10;
         int sign = 1;
@@ -71,17 +66,37 @@ public class Numbers {
             if (digit < 0)
                 return null;
 
-//            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
-//                return continueParseLong(sign, radix, number, digit, index, content);
-//            }
-
+            if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
+                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content);
+            }
             number = number * radix - digit;
         }
 
         return -number * sign;
     }
 
+    private static Number continueParseBigInteger(int sign, int radix, BigInteger number, int digit, int index, String content) {
+        BigInteger bigIntegerRadix = valueOf(radix);
+        number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
+        int length = content.length();
+        while (index < length) {
+            char c = content.charAt(index++);
+            if (c == '_' && index != length)
+                continue;
+            digit = getDigit(radix, c);
+            if (digit < 0)
+                return null;
+
+            number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
+        }
+        return sign == 1 ? number.negate() : number;
+    }
+
     private static boolean isOverflow(int digit, int number, int limit, int limitBeforeMul, int radix) {
+        return number < limitBeforeMul || number * radix < limit + digit;
+    }
+
+    private static boolean isOverflow(int digit, long number, long limit, long limitBeforeMul, int radix) {
         return number < limitBeforeMul || number * radix < limit + digit;
     }
 
