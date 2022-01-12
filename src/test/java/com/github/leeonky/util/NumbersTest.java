@@ -223,27 +223,27 @@ class NumbersTest {
         }
     }
 
-    //
-//    @Nested
-//    class ParseFloat {
-//
-//        @Nested
-//        class FromInteger {
-//
-//            @Test
-//            void dot_in_integer() {
-//                assertParse("1.5", 1.5d);
-//                assertParse("10.05", 10.05d);
-//                assertParse("1__0.0__5", 1__0.0__5d);
-//                assertParse("-0.0", -0.0d);
-//                assertParse("0.123456789", 0.123456789d);
-//            }
-//
-//            @Test
-//            void invalid_double() {
-//                assertParse("0x1.5", null);
-//                assertParse("1.1_", null);
-//            }
+
+    @Nested
+    class ParseFloat {
+
+        @Nested
+        class FromInteger {
+
+            @Test
+            void dot_in_integer() {
+                assertParse("1.5", 1.5d);
+                assertParse("10.05", 10.05d);
+                assertParse("1__0.0__5", 1__0.0__5d);
+                assertParse("-0.0", -0.0d);
+                assertParse("0.123456789", 0.123456789d);
+            }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x1.5", null);
+                assertParse("1.1_", null);
+            }
 //
 //            @Test
 //            void power_number_in_integer() {
@@ -268,29 +268,29 @@ class NumbersTest {
 //                assertParse("0x1E1", 0x1E1);
 //                assertParse("10E", null);
 //            }
-//        }
-//
-//        @Nested
-//        class FromLong {
-//
-//            @Test
-//            void dot_in_long() {
-//                assertParse("2147483648.5", 2147483648.5d);
-//                assertParse("2147483648.05", 2147483648.05d);
-//                assertParse("2147483648.0__5", 2147483648.0__5d);
-//            }
-//
-//            @Test
-//            void dot_should_between_number() {
-//                assertParse("2147483648.", null);
-//                assertParse("2147483648.n", null);
-//            }
-//
-//            @Test
-//            void invalid_double() {
-//                assertParse("0x2147483648.5", null);
-//                assertParse("2147483648.1_", null);
-//            }
+        }
+
+        @Nested
+        class FromLong {
+
+            @Test
+            void dot_in_long() {
+                assertParse("2147483648.5", 2147483648.5d);
+                assertParse("2147483648.05", 2147483648.05d);
+                assertParse("2147483648.0__5", 2147483648.0__5d);
+            }
+
+            @Test
+            void dot_should_between_number() {
+                assertParse("2147483648.", null);
+                assertParse("2147483648.n", null);
+            }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x2147483648.5", null);
+                assertParse("2147483648.1_", null);
+            }
 //
 //            @Test
 //            void power_number_in_integer() {
@@ -311,30 +311,30 @@ class NumbersTest {
 //                assertParse("0x8FFFFFFFE1", 0x8FFFFFFFE1L);
 //                assertParse("2147483648E", null);
 //            }
-//        }
-//
-//        @Nested
-//        class FromBigInteger {
-//
-//            @Test
-//            void dot_in_big_integer() {
-//                assertParse("100000000000000000000.5", 100000000000000000000.5d);
-//                assertParse("100000000000000000000.05", 100000000000000000000.05d);
-//                assertParse("100000000000000000000.0__5", 100000000000000000000.0__5d);
-//            }
-//
-//            @Test
-//            void dot_should_between_number() {
-//                assertParse("100000000000000000000.", null);
-//                assertParse("100000000000000000015.n", null);
-//            }
-//
-//            @Test
-//            void invalid_double() {
-//                assertParse("0x100000000000000000015.5", null);
-//                assertParse("100000000000000000015.1_", null);
-//            }
-//
+        }
+
+        @Nested
+        class FromBigInteger {
+
+            @Test
+            void dot_in_big_integer() {
+                assertParse("100000000000000000000.5", 100000000000000000000.5d);
+                assertParse("100000000000000000000.05", 100000000000000000000.05d);
+                assertParse("100000000000000000000.0__5", 100000000000000000000.0__5d);
+            }
+
+            @Test
+            void dot_should_between_number() {
+                assertParse("100000000000000000000.", null);
+                assertParse("100000000000000000015.n", null);
+            }
+
+            @Test
+            void invalid_double() {
+                assertParse("0x100000000000000000015.5", null);
+                assertParse("100000000000000000015.1_", null);
+            }
+
 //            @Test
 //            void power_number_in_integer() {
 //                assertParse("100000000000000000015E05", 100000000000000000015E5);
@@ -354,7 +354,7 @@ class NumbersTest {
 //                assertParse("0x100000000000000000015EA", new BigInteger("100000000000000000015EA", 16));
 //                assertParse("100000000000000000015E", null);
 //            }
-//        }
+        }
 //
 //        @Test
 //        void power_number_in_double() {
@@ -387,17 +387,18 @@ class NumbersTest {
 //            assertParse("0E.0", null);
 //            assertParse("0Ed", null);
 //        }
-//    }
-//
-//    @Test
-//    void invalid_number() {
-//        assertParse("+", null);
-//        assertParse("-", null);
-//        assertParse("1_", null);
-//        assertParse("", null);
-//        assertParse("notNumber", null);
-//    }
-//
+    }
+
+    @Test
+    void invalid_number() {
+        assertParse("+", null);
+        assertParse("-", null);
+        assertParse("1_", null);
+        assertParse("", null);
+        assertParse("notNumber", null);
+    }
+
+    //
 //    @Nested
 //    class ParseBigDecimal {
 //

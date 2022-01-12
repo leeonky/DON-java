@@ -40,12 +40,14 @@ public class Numbers {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
+            if (isFloatDot(radix, c, index, length, content))
+                return parseDoubleWithDot(sign, number, radix, content, index, length);
             int digit = getDigit(radix, c);
             if (digit < 0)
                 return null;
 
             if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
-                return continueParseLong(sign, radix, number, digit, index, content);
+                return continueParseLong(sign, radix, number, digit, index, content, length);
             }
 
             number = number * radix - digit;
@@ -53,21 +55,56 @@ public class Numbers {
         return -number * sign;
     }
 
-    private static Number continueParseLong(int sign, int radix, long number, int digit, int index, String content) {
+    private static boolean isFloatDot(int radix, char c, int index, int length, String content) {
+        return c == '.' && radix == 10
+                && index > 1 && isDigit(content.charAt(index - 2))
+                && index < length && isDigit(content.charAt(index));
+    }
+
+    private static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private static Number parseDoubleWithDot(int sign, Object number, int radix, String content, int index, int length) {
+        StringBuilder stringBuilder = new StringBuilder(content.length());
+        if (number.equals(0))
+            stringBuilder.append('-');
+        stringBuilder.append(number);
+        stringBuilder.append('.');
+        while (index < length) {
+            char c = content.charAt(index++);
+            if (c == '_' && index != length)
+                continue;
+            if (notDigit(c))
+                return null;
+            stringBuilder.append(c);
+        }
+        return toDoubleOrBigDecimal(sign, stringBuilder.toString());
+    }
+
+    private static boolean notDigit(char c) {
+        return c < '0' || c > '9';
+    }
+
+    private static Number toDoubleOrBigDecimal(int sign, String toString) {
+        return Double.parseDouble(toString) * -sign;
+    }
+
+    private static Number continueParseLong(int sign, int radix, long number, int digit, int index, String content, int length) {
         number = number * radix - digit;
-        int length = content.length();
         long limit = sign == 1 ? -Long.MAX_VALUE : Long.MIN_VALUE;
         long limitBeforeMul = limit / radix;
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
+            if (isFloatDot(radix, c, index, length, content))
+                return parseDoubleWithDot(sign, number, radix, content, index, length);
             digit = getDigit(radix, c);
             if (digit < 0)
                 return null;
-
             if (isOverflow(digit, number, limit, limitBeforeMul, radix)) {
-                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content);
+                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content, length);
             }
             number = number * radix - digit;
         }
@@ -75,14 +112,15 @@ public class Numbers {
         return -number * sign;
     }
 
-    private static Number continueParseBigInteger(int sign, int radix, BigInteger number, int digit, int index, String content) {
+    private static Number continueParseBigInteger(int sign, int radix, BigInteger number, int digit, int index, String content, int length) {
         BigInteger bigIntegerRadix = valueOf(radix);
         number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
-        int length = content.length();
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
                 continue;
+            if (isFloatDot(radix, c, index, length, content))
+                return parseDoubleWithDot(sign, number, radix, content, index, length);
             digit = getDigit(radix, c);
             if (digit < 0)
                 return null;
