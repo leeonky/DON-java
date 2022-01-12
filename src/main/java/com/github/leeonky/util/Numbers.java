@@ -11,10 +11,60 @@ public class Numbers {
     public static Number parseNumber(String content) {
         if (content == null || content.length() == 0)
             return null;
-        NumberContext numberContext = new NumberContext(content);
-        if (numberContext.atTheEnd())
-            return null;
-        return new Parser.IntegerParser(numberContext).parse(0);
+        return parseFromInteger(content);
+//        NumberContext numberContext = new NumberContext(content);
+//        if (numberContext.atTheEnd())
+//            return null;
+//        return new Parser.IntegerParser(numberContext).parse(0);
+    }
+
+    private static Number parseFromInteger(String content) {
+        int index = 0;
+        int length = content.length();
+        int intNumber = 0;
+        int radix = 10;
+        int sign = 1;
+        if (content.charAt(index) == '+') {
+            if (++index == length)
+                return null;
+        }
+        if (content.charAt(index) == '-') {
+            if (++index == length)
+                return null;
+            sign = -1;
+        }
+        if (content.startsWith("0x", index) || content.startsWith("0X", index)) {
+            if ((index += 2) == length)
+                return null;
+            radix = 16;
+        }
+
+        while (index < length) {
+            char c = content.charAt(index++);
+            if (c == '_' && index != length)
+                continue;
+            int digit = getDigit(radix, c);
+            if (digit < 0)
+                return null;
+            intNumber = intNumber * radix - digit;
+        }
+        return -intNumber * sign;
+    }
+
+    private static int getDigit(int radix, char c) {
+        int value;
+        if (radix > 10) {
+            if (c > 'a')
+                value = c - 'a' + 10;
+            else if (c > 'A')
+                value = c - 'A' + 10;
+            else
+                value = c - '0';
+        } else
+            value = c - '0';
+        if (value >= 0 && value < radix)
+            return value;
+        return -1;
     }
 }
 
