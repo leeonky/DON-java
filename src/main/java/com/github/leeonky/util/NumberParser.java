@@ -62,12 +62,12 @@ public class NumberParser {
     }, BIG_INTEGER_POSTFIX = new NumberPostfix(2) {
         @Override
         public Number convert(int number, String content) {
-            return BigInteger.valueOf(number);
+            return valueOf(number);
         }
 
         @Override
         public Number convert(long number, String content) {
-            return BigInteger.valueOf(number);
+            return valueOf(number);
         }
 
         @Override
@@ -133,8 +133,9 @@ public class NumberParser {
                 postfix = LONG_POSTFIX;
                 break;
             default:
-                if (content.endsWith("bi") || content.endsWith("BI"))
+                if (content.endsWith("bi") || content.endsWith("BI")) {
                     postfix = BIG_INTEGER_POSTFIX;
+                }
                 break;
         }
         if (postfix != null && index == (length -= postfix.getLength()))
@@ -167,11 +168,11 @@ public class NumberParser {
     }
 
     private Number parseDoubleWithPower(int sign, Object number, String content, int index, int length) {
-        return parseDoubleWithPower(sign, content, index, length, createStringBuffer(number, content));
+        return parseDoubleWithPower(sign, content, index, length, createStringBuffer(number, length));
     }
 
-    private StringBuilder createStringBuffer(Object number, String content) {
-        StringBuilder stringBuilder = new StringBuilder(content.length());
+    private StringBuilder createStringBuffer(Object number, int length) {
+        StringBuilder stringBuilder = new StringBuilder(length);
         if (number.equals(0))
             stringBuilder.append('-');
         stringBuilder.append(number);
@@ -232,7 +233,7 @@ public class NumberParser {
     }
 
     private Number parseDoubleWithDot(int sign, Object number, int radix, String content, int index, int length) {
-        StringBuilder stringBuilder = createStringBuffer(number, content);
+        StringBuilder stringBuilder = createStringBuffer(number, length);
         stringBuilder.append('.');
         while (index < length) {
             char c = content.charAt(index++);
@@ -275,17 +276,18 @@ public class NumberParser {
                 return null;
             }
             if (isOverflow(digit, number, limit, limitBeforeMul, radix))
-                return continueParseBigInteger(sign, radix, valueOf(number), digit, index, content, length, postfix);
+                return continueParseBigInteger(sign, radix, number, digit, index, content, length, postfix);
             number = number * radix - digit;
         }
         number = -number * sign;
         return postfix == null ? number : postfix.convert(number, content);
     }
 
-    private Number continueParseBigInteger(int sign, int radix, BigInteger number, int digit, int index,
+    private Number continueParseBigInteger(int sign, int radix, long number1, int digit, int index,
                                            String content, int length, NumberPostfix postfix) {
-        BigInteger bigIntegerRadix = valueOf(radix);
-        number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
+        StringBuilder stringBuilder = new StringBuilder(length);
+        stringBuilder.append(Long.toString(number1, radix));
+        stringBuilder.append(Integer.toString(digit, radix));
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
@@ -293,13 +295,14 @@ public class NumberParser {
             digit = getDigit(radix, c);
             if (digit < 0) {
                 if (isFloatDot(radix, c, index, length, content))
-                    return parseDoubleWithDot(sign, number, radix, content, index, length);
+                    return parseDoubleWithDot(sign, stringBuilder, radix, content, index, length);
                 if (isPowerChar(radix, c, index, length, content))
-                    return parseDoubleWithPower(sign, number, content, index, length);
+                    return parseDoubleWithPower(sign, stringBuilder, content, index, length);
                 return null;
             }
-            number = number.multiply(bigIntegerRadix).subtract(valueOf(digit));
+            stringBuilder.append(c);
         }
+        BigInteger number = new BigInteger(stringBuilder.toString(), radix);
         number = sign == 1 ? number.negate() : number;
         return postfix == null ? number : postfix.convert(number, content);
     }
