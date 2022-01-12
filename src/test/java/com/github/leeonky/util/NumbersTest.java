@@ -440,31 +440,31 @@ class NumbersTest {
     }
 
 
-    //    @Nested
-//    class Postfix {
-//
-//        @Nested
-//        class IntegerParse {
-//
-//            @Test
-//            void as_byte() {
-//                assertParse("0y", (byte) 0);
-//                assertParse("1y", (byte) 1);
-//                assertParse("-1y", (byte) -1);
-//                assertParse("-128y", (byte) -128);
-//                assertParse("127y", (byte) 127);
-//                assertParse("-0x80y", (byte) -128);
-//                assertParse("0x7fy", (byte) 127);
-//
-//                assertParse("0Y", (byte) 0);
-//                assertParse("1Y", (byte) 1);
-//
-//                assertParseOverflow("128y");
-//                assertParseOverflow("-129y");
-//            }
-//
-//            @Test
-//            void as_short() {
+    @Nested
+    class Postfix {
+
+        @Nested
+        class IntegerParse {
+
+            @Test
+            void as_byte() {
+                assertParse("0y", (byte) 0);
+                assertParse("1y", (byte) 1);
+                assertParse("-1y", (byte) -1);
+                assertParse("-128y", (byte) -128);
+                assertParse("127y", (byte) 127);
+                assertParse("-0x80y", (byte) -128);
+                assertParse("0x7fy", (byte) 127);
+
+                assertParse("0Y", (byte) 0);
+                assertParse("1Y", (byte) 1);
+
+                assertParseOverflow("128y");
+                assertParseOverflow("-129y");
+            }
+
+            @Test
+            void as_short() {
 //                assertParse("0s", (short) 0);
 //                assertParse("1s", (short) 1);
 //                assertParse("-1s", (short) -1);
@@ -511,16 +511,17 @@ class NumbersTest {
 //                assertParse("1d", 1.0);
 //                assertParse("-1d", -1.0);
 //            }
-//        }
-//
-//        @Nested
-//        class LongParse {
-//
-//            @Test
-//            void as_byte() {
-//                assertParseOverflow("0xffff_ffff_ffy");
-//                assertParseOverflow("-0xffff_ffff_ffy");
-//            }
+            }
+
+            //
+            @Nested
+            class LongParse {
+
+                @Test
+                void as_byte() {
+                    assertParseOverflow("0xffff_ffff_ffy");
+                    assertParseOverflow("-0xffff_ffff_ffy");
+                }
 //
 //            @Test
 //            void as_short() {
@@ -560,16 +561,17 @@ class NumbersTest {
 //                assertParse("2147483648d", 2147483648d);
 //                assertParse("-2147483648d", -2147483648d);
 //            }
-//        }
-//
-//        @Nested
-//        class BigIntegerParser {
-//
-//            @Test
-//            void as_byte() {
-//                assertParseOverflow("0x8000_0000_0000_0000y");
-//                assertParseOverflow("-0x8000_0000_0000_0001y");
-//            }
+            }
+
+            //
+            @Nested
+            class BigIntegerParser {
+
+                @Test
+                void as_byte() {
+                    assertParseOverflow("0x8000_0000_0000_0000y");
+                    assertParseOverflow("-0x8000_0000_0000_0001y");
+                }
 //
 //            @Test
 //            void as_short() {
@@ -606,7 +608,7 @@ class NumbersTest {
 //                assertParse("9223372036854775808d", 9223372036854775808d);
 //                assertParse("-9223372036854775808d", -9223372036854775808d);
 //            }
-//        }
+            }
 //
 //        @Nested
 //        class DotFloatParser {
@@ -730,8 +732,9 @@ class NumbersTest {
 //            assertParse("1_bd", null);
 //            assertParse("1_bi", null);
 //        }
-//    }
-//
+        }
+    }
+
     private void assertParseOverflow(String code) {
         assertThat(assertThrows(NumberOverflowException.class, () -> parseNumber(code)))
                 .hasMessageContaining(String.format("Cannon save [%s] with the given postfix type", code));
