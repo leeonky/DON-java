@@ -483,14 +483,14 @@ class NumbersTest {
                 assertParse("-0x8000_0000l", -2147483648L);
                 assertParse("0x7fff_ffffl", 2147483647L);
             }
-//
-//            @Test
-//            void as_big_integer() {
-//                assertParse("0bi", BigInteger.valueOf(0));
-//                assertParse("10bi", BigInteger.valueOf(10));
-//                assertParse("-10bi", BigInteger.valueOf(-10));
-//            }
-//
+
+            @Test
+            void as_big_integer() {
+                assertParse("0bi", BigInteger.valueOf(0));
+                assertParse("10bi", BigInteger.valueOf(10));
+                assertParse("-10bi", BigInteger.valueOf(-10));
+            }
+
 //            @Test
 //            void as_big_decimal() {
 //                assertParse("0bd", BigDecimal.valueOf(0));
@@ -538,12 +538,12 @@ class NumbersTest {
                 assertParse("0x7fff_ffff_ffff_ffff", 0x7fff_ffff_ffff_ffffL);
             }
 
-//            @Test
-//            void as_big_integer() {
-//                assertParse("0xffff_ffff_ffbi", new BigInteger("ffffffffff", 16));
-//                assertParse("-0xffff_ffff_ffbi", new BigInteger("-ffffffffff", 16));
-//            }
-//
+            @Test
+            void as_big_integer() {
+                assertParse("0xffff_ffff_ffbi", new BigInteger("ffffffffff", 16));
+                assertParse("-0xffff_ffff_ffbi", new BigInteger("-ffffffffff", 16));
+            }
+
 //            @Test
 //            void as_big_decimal() {
 //                assertParse("2147483648bd", BigDecimal.valueOf(2147483648L));
@@ -584,13 +584,13 @@ class NumbersTest {
                 assertParseOverflow("0x8000_0000_0000_0000l");
                 assertParseOverflow("-0x8000_0000_0000_0001l");
             }
-//
-//            @Test
-//            void as_big_integer() {
-//                assertParse("0x8000_0000_0000_0000bi", new BigInteger("8000000000000000", 16));
-//                assertParse("-0x8000_0000_0000_0001bi", new BigInteger("-8000000000000001", 16));
-//            }
-//
+
+            @Test
+            void as_big_integer() {
+                assertParse("0x8000_0000_0000_0000bi", new BigInteger("8000000000000000", 16));
+                assertParse("-0x8000_0000_0000_0001bi", new BigInteger("-8000000000000001", 16));
+            }
+
 //            @Test
 //            void as_big_decimal() {
 //                assertParse("9223372036854775808bd", new BigDecimal("9223372036854775808"));

@@ -59,6 +59,21 @@ public class NumberParser {
         public Number convert(BigInteger number, String content) {
             throw new NumberOverflowException(content);
         }
+    }, BIG_INTEGER_POSTFIX = new NumberPostfix(2) {
+        @Override
+        public Number convert(int number, String content) {
+            return BigInteger.valueOf(number);
+        }
+
+        @Override
+        public Number convert(long number, String content) {
+            return BigInteger.valueOf(number);
+        }
+
+        @Override
+        public Number convert(BigInteger number, String content) {
+            return number;
+        }
     };
 
     public static abstract class NumberPostfix {
@@ -116,6 +131,10 @@ public class NumberParser {
             case 'l':
             case 'L':
                 postfix = LONG_POSTFIX;
+                break;
+            default:
+                if (content.endsWith("bi") || content.endsWith("BI"))
+                    postfix = BIG_INTEGER_POSTFIX;
                 break;
         }
         if (postfix != null && index == (length -= postfix.getLength()))
