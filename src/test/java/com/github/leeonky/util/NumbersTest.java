@@ -490,19 +490,19 @@ class NumbersTest {
                 assertParse("-10bi", BigInteger.valueOf(-10));
             }
 
-//            @Test
+            //            @Test
 //            void as_big_decimal() {
 //                assertParse("0bd", BigDecimal.valueOf(0));
 //                assertParse("1bd", BigDecimal.valueOf(1));
 //                assertParse("-1bd", BigDecimal.valueOf(-1));
 //            }
 //
-//            @Test
-//            void as_float() {
-//                assertParse("0f", 0.0f);
-//                assertParse("1f", 1.0f);
-//                assertParse("-1f", -1.0f);
-//            }
+            @Test
+            void as_float() {
+                assertParse("0f", 0.0f);
+                assertParse("1f", 1.0f);
+                assertParse("-1f", -1.0f);
+            }
 //
 //            @Test
 //            void as_double() {
@@ -562,7 +562,7 @@ class NumbersTest {
 //            }
         }
 
-        //
+
         @Nested
         class BigIntegerParser {
 
@@ -609,8 +609,7 @@ class NumbersTest {
 //            }
         }
 
-        //
-//        @Nested
+        //        @Nested
 //        class DotFloatParser {
 //
 //            @Test
