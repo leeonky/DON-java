@@ -255,10 +255,10 @@ class NumbersTest {
 
             @Test
             void dot_in_integer() {
+                assertParse("-0.0", -0.0d);
                 assertParse("1.5", 1.5d);
                 assertParse("10.05", 10.05d);
                 assertParse("1__0.0__5", 1__0.0__5d);
-                assertParse("-0.0", -0.0d);
                 assertParse("0.123456789", 0.123456789d);
             }
 
@@ -270,14 +270,13 @@ class NumbersTest {
 
             @Test
             void power_number_in_integer() {
+                assertParse("-0E5", -0E5);
                 assertParse("10E05", 10E5);
                 assertParse("10E1_5", 10E1_5);
                 assertParse("10E15", 10E15);
                 assertParse("10E-5", 10E-5);
                 assertParse("10E+5", 10E5);
                 assertParse("0E5", 0E5);
-                assertParse("-0E5", -0E5);
-
             }
 
             @Test
