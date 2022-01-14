@@ -11,23 +11,9 @@ public class NumberParser {
                 throw new NumberOverflowException(content);
             return (byte) number;
         }
-
-        @Override
-        public Number convertFrom(long number, String content) {
-            if (number > Byte.MAX_VALUE || number < Byte.MIN_VALUE)
-                throw new NumberOverflowException(content);
-            return (short) number;
-        }
     }, SHORT_POSTFIX = new NumberPostfix(1) {
         @Override
         public Number convertFrom(int number, String content) {
-            if (number > Short.MAX_VALUE || number < Short.MIN_VALUE)
-                throw new NumberOverflowException(content);
-            return (short) number;
-        }
-
-        @Override
-        public Number convertFrom(long number, String content) {
             if (number > Short.MAX_VALUE || number < Short.MIN_VALUE)
                 throw new NumberOverflowException(content);
             return (short) number;
@@ -99,11 +85,11 @@ public class NumberParser {
         }
 
         public Number convertFrom(int number, String content) {
-            throw new IllegalStateException(content);
+            throw new NumberOverflowException(content);
         }
 
         public Number convertFrom(long number, String content) {
-            throw new IllegalStateException(content);
+            throw new NumberOverflowException(content);
         }
 
         public Number convertFromBigInteger(String numberString, int radix, String content) {
@@ -212,7 +198,8 @@ public class NumberParser {
                 return continueParseLong(sign, radix, number, digit, index, content, length, postfix);
             number = number * radix - digit;
         }
-        number = -number * sign;
+        if (sign == 1)
+            number = -number;
         return postfix != null ? postfix.convertFrom(number, content) : number;
     }
 
@@ -265,6 +252,10 @@ public class NumberParser {
         return index > 1 && isDigit(content.charAt(index - 2));
     }
 
+    private boolean notDigit(char c) {
+        return c < '0' || c > '9';
+    }
+
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
@@ -282,10 +273,6 @@ public class NumberParser {
             stringBuilder.append(c);
         }
         return toDoubleOrBigDecimal(stringBuilder, postfix, content);
-    }
-
-    private boolean notDigit(char c) {
-        return c < '0' || c > '9';
     }
 
     private Number toDoubleOrBigDecimal(StringBuilder stringBuilder, NumberPostfix postfix, String content) {
@@ -320,7 +307,8 @@ public class NumberParser {
                         toStringBuilder(radix, sign, number, length).append(c));
             number = number * radix - digit;
         }
-        number = -number * sign;
+        if (sign == 1)
+            number = -number;
         return postfix == null ? number : postfix.convertFrom(number, content);
     }
 
@@ -358,15 +346,12 @@ public class NumberParser {
 
     private int getDigit(int radix, char c) {
         int value;
-        if (radix > 10) {
-            if (c >= 'a')
-                value = c - 'a' + 10;
-            else if (c >= 'A')
-                value = c - 'A' + 10;
-            else
-                value = c - '0';
-        } else
+        if (c <= '9')
             value = c - '0';
+        else if (c >= 'a')
+            value = c - 'a' + 10;
+        else
+            value = c - 'A' + 10;
         if (value >= 0 && value < radix)
             return value;
         return -1;

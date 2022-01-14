@@ -7,11 +7,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 
-import static com.github.leeonky.util.Numbers.parseNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class NumbersTest {
+class NumberParserTest {
 
     @Nested
     class IntegerNumber {
@@ -254,7 +253,6 @@ class NumbersTest {
 
             @Test
             void dot_in_integer() {
-                assertParse("0.0", 0.0d);
                 assertParse("-0.0", -0.0d);
                 assertParse("1.5", 1.5d);
                 assertParse("10.05", 10.05d);
@@ -415,11 +413,6 @@ class NumbersTest {
             assertParse("0ex", null);
             assertParse("0E.0", null);
             assertParse("0Ed", null);
-
-            assertParse("0e1", 0e1);
-            assertParse("0e9", 0e9);
-            assertParse("1e0", 1e0);
-            assertParse("9e1", 9e1);
         }
     }
 
@@ -522,6 +515,7 @@ class NumbersTest {
             }
         }
 
+        //
         @Nested
         class LongParse {
 
@@ -570,6 +564,7 @@ class NumbersTest {
                 assertParse("-2147483648d", -2147483648d);
             }
         }
+
 
         @Nested
         class BigIntegerParser {
@@ -742,15 +737,15 @@ class NumbersTest {
     }
 
     private void assertParseOverflow(String code) {
-        assertThat(assertThrows(NumberOverflowException.class, () -> parseNumber(code)))
+        assertThat(assertThrows(NumberOverflowException.class, () -> new NumberParser().parse(code)))
                 .hasMessageContaining(String.format("Cannon save [%s] with the given postfix type", code));
     }
 
     private void assertParse(String inputCode, Number expected) {
         if (expected instanceof BigDecimal) {
-            assertThat(((BigDecimal) parseNumber(inputCode)).subtract((BigDecimal) expected)).isZero();
+            assertThat(((BigDecimal) new NumberParser().parse(inputCode)).subtract((BigDecimal) expected)).isZero();
         } else
-            assertThat(parseNumber(inputCode)).isEqualTo(expected);
+            assertThat(new NumberParser().parse(inputCode)).isEqualTo(expected);
     }
 }
 

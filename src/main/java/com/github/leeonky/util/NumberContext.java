@@ -52,7 +52,13 @@ class NumberContext {
     }
 
     private boolean isPowerChar(char c) {
-        return (c == 'e' || c == 'E') && getRadix() == 10 && afterDigit() && !atTheEnd();
+        return (c == 'e' || c == 'E') && getRadix() == 10 && afterDigit() && (atTheEnd() || beforeDigitOrSign());
+
+    }
+
+    private boolean beforeDigitOrSign() {
+        char c = content.charAt(currentIndex);
+        return !notDigit(c) || c == '-' || c == '+';
     }
 
     private Number parseDoubleWithPower(String firstPart, int sign, Postfix<?> postfix) {
@@ -60,6 +66,8 @@ class NumberContext {
         stringBuilder.append('E');
         if (parseSign() == -1)
             stringBuilder.append('-');
+        if (atTheEnd())
+            return null;
         for (char c : leftChars()) {
             if (notDigit(c))
                 return null;
