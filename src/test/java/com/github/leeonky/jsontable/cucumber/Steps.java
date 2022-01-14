@@ -1,6 +1,6 @@
 package com.github.leeonky.jsontable.cucumber;
 
-import com.github.leeonky.util.Numbers;
+import com.github.leeonky.util.NumberParser;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 
@@ -22,10 +22,12 @@ public class Steps {
 
     @Then("got the following number:")
     public void got_the_following_number(String assertion) {
-        expect(Numbers.parseNumber(inputCode)).should(assertion);
+        expect(new NumberParser().parse(inputCode)).should(assertion);
     }
 
     public static class JsonTableParser {
+        NumberParser numberParser = new NumberParser();
+
         public Object parse(String content) {
             if (content.equals("null"))
                 return null;
@@ -33,7 +35,7 @@ public class Steps {
                 return true;
             if (content.equals("false"))
                 return false;
-            return Numbers.parseNumber(content);
+            return numberParser.parse(content);
         }
     }
 }

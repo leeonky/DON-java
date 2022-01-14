@@ -4,21 +4,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class NumberParser {
-    private static final NumberPostfix BYTE_POSTFIX = new NumberPostfix(1) {
+    private static final PrimitiveIntegerPostfix BYTE_POSTFIX = new PrimitiveIntegerPostfix(1) {
         @Override
         public Number convertFrom(int number, String content) {
             if (number > Byte.MAX_VALUE || number < Byte.MIN_VALUE)
                 throw new NumberOverflowException(content);
             return (byte) number;
         }
-    }, SHORT_POSTFIX = new NumberPostfix(1) {
+    }, SHORT_POSTFIX = new PrimitiveIntegerPostfix(1) {
         @Override
         public Number convertFrom(int number, String content) {
             if (number > Short.MAX_VALUE || number < Short.MIN_VALUE)
                 throw new NumberOverflowException(content);
             return (short) number;
         }
-    }, LONG_POSTFIX = new NumberPostfix(1) {
+    }, LONG_POSTFIX = new PrimitiveIntegerPostfix(1) {
         @Override
         public Number convertFrom(int number, String content) {
             return (long) number;
@@ -28,12 +28,13 @@ public class NumberParser {
         public Number convertFrom(long number, String content) {
             return number;
         }
-    }, BIG_INTEGER_POSTFIX = new NumberPostfix(2) {
+    };
+    private static final StringNumberPostfix BIG_INTEGER_POSTFIX = new StringNumberPostfix(2) {
         @Override
         public Number convertFromBigInteger(String numberString, int radix, String content) {
             return new BigInteger(numberString, radix);
         }
-    }, FLOAT_POSTFIX = new NumberPostfix(1) {
+    }, FLOAT_POSTFIX = new StringNumberPostfix(1) {
         @Override
         public Number convertFromDecimal(String numberString, String content) {
             return verifyInfinite(Float.parseFloat(numberString), content);
@@ -49,7 +50,7 @@ public class NumberParser {
         public Number convertFromBigInteger(String numberString, int radix, String content) {
             return verifyInfinite(Float.parseFloat(numberString), content);
         }
-    }, DOUBLE_POSTFIX = new NumberPostfix(1) {
+    }, DOUBLE_POSTFIX = new StringNumberPostfix(1) {
         @Override
         public Number convertFromDecimal(String numberString, String content) {
             return verifyInfinite(Double.parseDouble(numberString), content);
@@ -65,7 +66,7 @@ public class NumberParser {
                 throw new NumberOverflowException(content);
             return d;
         }
-    }, BIG_DECIMAL_POSTFIX = new NumberPostfix(2) {
+    }, BIG_DECIMAL_POSTFIX = new StringNumberPostfix(2) {
         @Override
         public Number convertFromDecimal(String numberString, String content) {
             return new BigDecimal(numberString);
@@ -77,19 +78,11 @@ public class NumberParser {
         }
     };
 
-    public static abstract class NumberPostfix {
-        private final int length;
+    static class StringNumberPostfix {
+        public final int length;
 
-        protected NumberPostfix(int length) {
+        public StringNumberPostfix(int length) {
             this.length = length;
-        }
-
-        public Number convertFrom(int number, String content) {
-            throw new NumberOverflowException(content);
-        }
-
-        public Number convertFrom(long number, String content) {
-            throw new NumberOverflowException(content);
         }
 
         public Number convertFromBigInteger(String numberString, int radix, String content) {
@@ -97,6 +90,18 @@ public class NumberParser {
         }
 
         public Number convertFromDecimal(String numberString, String content) {
+            throw new NumberOverflowException(content);
+        }
+    }
+
+    static abstract class PrimitiveIntegerPostfix extends StringNumberPostfix {
+        protected PrimitiveIntegerPostfix(int length) {
+            super(length);
+        }
+
+        public abstract Number convertFrom(int number, String content);
+
+        public Number convertFrom(long number, String content) {
             throw new NumberOverflowException(content);
         }
     }
@@ -125,7 +130,7 @@ public class NumberParser {
             radix = 16;
         }
         c = content.charAt(length - 1);
-        NumberPostfix postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
+        StringNumberPostfix postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
         if (postfix != null) {
             if (index == (length -= postfix.length))
                 return null;
@@ -134,7 +139,7 @@ public class NumberParser {
         return parseFromInteger(content, length, sign, index, radix, fetchOtherPostfix(c));
     }
 
-    private NumberPostfix fetchOtherPostfix(char c) {
+    private PrimitiveIntegerPostfix fetchOtherPostfix(char c) {
         switch (c) {
             case 'y':
             case 'Y':
@@ -149,7 +154,7 @@ public class NumberParser {
         return null;
     }
 
-    private NumberPostfix fetchDecimalOrBigIntegerPostfix(String content, int radix, char c) {
+    private StringNumberPostfix fetchDecimalOrBigIntegerPostfix(String content, int radix, char c) {
         if (content.endsWith("bi") || content.endsWith("BI"))
             return BIG_INTEGER_POSTFIX;
         if (radix == 10) {
@@ -174,7 +179,7 @@ public class NumberParser {
         return stringBuilder;
     }
 
-    private Number parseFromInteger(String content, int length, int sign, int index, int radix, NumberPostfix postfix) {
+    private Number parseFromInteger(String content, int length, int sign, int index, int radix, PrimitiveIntegerPostfix postfix) {
         if (postfix != null) {
             if (index == (length -= postfix.length))
                 return null;
@@ -203,7 +208,7 @@ public class NumberParser {
         return postfix != null ? postfix.convertFrom(number, content) : number;
     }
 
-    private Number parseDoubleWithPower(String content, int index, int length, StringBuilder stringBuilder, NumberPostfix postfix) {
+    private Number parseDoubleWithPower(String content, int index, int length, StringBuilder stringBuilder, StringNumberPostfix postfix) {
         stringBuilder.append('E');
         int eSign = 1;
         if (content.charAt(index) == '+') {
@@ -260,7 +265,7 @@ public class NumberParser {
         return c >= '0' && c <= '9';
     }
 
-    private Number parseDoubleWithDot(StringBuilder stringBuilder, int radix, String content, int index, int length, NumberPostfix postfix) {
+    private Number parseDoubleWithDot(StringBuilder stringBuilder, int radix, String content, int index, int length, StringNumberPostfix postfix) {
         stringBuilder.append('.');
         while (index < length) {
             char c = content.charAt(index++);
@@ -275,7 +280,7 @@ public class NumberParser {
         return toDoubleOrBigDecimal(stringBuilder, postfix, content);
     }
 
-    private Number toDoubleOrBigDecimal(StringBuilder stringBuilder, NumberPostfix postfix, String content) {
+    private Number toDoubleOrBigDecimal(StringBuilder stringBuilder, StringNumberPostfix postfix, String content) {
         String numberString = stringBuilder.toString();
         if (postfix != null)
             return postfix.convertFromDecimal(numberString, content);
@@ -286,7 +291,7 @@ public class NumberParser {
     }
 
     private Number continueParseLong(int sign, int radix, long number, int digit, int index,
-                                     String content, int length, NumberPostfix postfix) {
+                                     String content, int length, PrimitiveIntegerPostfix postfix) {
         number = number * radix - digit;
         long limitLong = sign == 1 ? -Long.MAX_VALUE : Long.MIN_VALUE;
         long limitBeforeMulLong = limitLong / radix;
@@ -313,7 +318,7 @@ public class NumberParser {
     }
 
     private Number continueParseBigInteger(int radix, int index, String content, int length,
-                                           NumberPostfix postfix, StringBuilder stringBuilder) {
+                                           StringNumberPostfix postfix, StringBuilder stringBuilder) {
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
