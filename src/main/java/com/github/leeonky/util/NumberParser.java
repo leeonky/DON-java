@@ -79,14 +79,6 @@ public class NumberParser {
         }
     };
 
-    private static final NumberPostfix[] INTEGER_POSTFIXES = new NumberPostfix[128];
-
-    static {
-        INTEGER_POSTFIXES['y'] = INTEGER_POSTFIXES['Y'] = BYTE_POSTFIX;
-        INTEGER_POSTFIXES['s'] = INTEGER_POSTFIXES['S'] = SHORT_POSTFIX;
-        INTEGER_POSTFIXES['l'] = INTEGER_POSTFIXES['L'] = LONG_POSTFIX;
-    }
-
     public static abstract class NumberPostfix {
         private final int length;
 
@@ -95,11 +87,11 @@ public class NumberParser {
         }
 
         public Number convertFrom(int number, String content) {
-            return null;
+            throw new IllegalStateException(content);
         }
 
         public Number convertFrom(long number, String content) {
-            return null;
+            throw new IllegalStateException(content);
         }
 
         public Number convertFromBigInteger(String numberString, int radix, String content) {
@@ -119,11 +111,11 @@ public class NumberParser {
             return null;
         int sign = 1;
         int index = 0;
-        if (content.charAt(index) == '+') {
+        char c = content.charAt(index);
+        if (c == '+') {
             if (++index == length)
                 return null;
-        }
-        if (content.charAt(index) == '-') {
+        } else if (c == '-') {
             if (++index == length)
                 return null;
             sign = -1;
@@ -135,34 +127,45 @@ public class NumberParser {
             radix = 16;
         }
 
-        char c = content.charAt(length - 1);
-        NumberPostfix postfix = INTEGER_POSTFIXES[c];
-        if (postfix == null) {
-            postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
-            if (postfix != null) {
-                if (index == (length -= postfix.length))
-                    return null;
-                return continueParseBigInteger(radix, index, content, length, postfix, newStringBuilder(length, sign));
-            }
-        } else if (index == (length -= postfix.length))
-            return null;
-        return parseFromInteger(content, length, sign, index, radix, postfix);
+        c = content.charAt(length - 1);
+        NumberPostfix postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
+        if (postfix != null) {
+            if (index == (length -= postfix.length))
+                return null;
+            return continueParseBigInteger(radix, index, content, length, postfix, newStringBuilder(length, sign));
+        }
+        return parseFromInteger(content, length, sign, index, radix, fetchOtherPostfix(c));
+    }
+
+    private NumberPostfix fetchOtherPostfix(char c) {
+        switch (c) {
+            case 'y':
+            case 'Y':
+                return BYTE_POSTFIX;
+            case 's':
+            case 'S':
+                return SHORT_POSTFIX;
+            case 'l':
+            case 'L':
+                return LONG_POSTFIX;
+        }
+        return null;
     }
 
     private NumberPostfix fetchDecimalOrBigIntegerPostfix(String content, int radix, char c) {
         if (content.endsWith("bi") || content.endsWith("BI"))
             return BIG_INTEGER_POSTFIX;
-        if ((content.endsWith("bd") || content.endsWith("BD")) && radix == 10)
-            return BIG_DECIMAL_POSTFIX;
-        switch (c) {
-            case 'f':
-            case 'F':
-                if (radix == 10)
+        if (radix == 10) {
+            if (content.endsWith("bd") || content.endsWith("BD"))
+                return BIG_DECIMAL_POSTFIX;
+            switch (c) {
+                case 'f':
+                case 'F':
                     return FLOAT_POSTFIX;
-            case 'd':
-            case 'D':
-                if (radix == 10)
+                case 'd':
+                case 'D':
                     return DOUBLE_POSTFIX;
+            }
         }
         return null;
     }
@@ -175,6 +178,10 @@ public class NumberParser {
     }
 
     private Number parseFromInteger(String content, int length, int sign, int index, int radix, NumberPostfix postfix) {
+        if (postfix != null) {
+            if (index == (length -= postfix.length))
+                return null;
+        }
         int number = 0;
         int limit = sign == 1 ? -Integer.MAX_VALUE : Integer.MIN_VALUE;
         int limitBeforeMul = limit / radix;

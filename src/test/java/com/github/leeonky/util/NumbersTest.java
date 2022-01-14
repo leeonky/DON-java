@@ -419,6 +419,7 @@ class NumbersTest {
         assertParse("1_", null);
         assertParse("", null);
         assertParse("notNumber", null);
+        assertParse("+-1", null);
     }
 
 
