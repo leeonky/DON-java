@@ -3,8 +3,6 @@ package com.github.leeonky.util;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static java.math.BigInteger.valueOf;
-
 public class NumberParser {
     private static final NumberPostfix BYTE_POSTFIX = new NumberPostfix(1) {
         @Override
@@ -46,30 +44,10 @@ public class NumberParser {
         }
     }, BIG_INTEGER_POSTFIX = new NumberPostfix(2) {
         @Override
-        public Number convertFrom(int number, String content) {
-            return valueOf(number);
-        }
-
-        @Override
-        public Number convertFrom(long number, String content) {
-            return valueOf(number);
-        }
-
-        @Override
         public Number convertFromBigInteger(String numberString, int radix, String content) {
             return new BigInteger(numberString, radix);
         }
     }, FLOAT_POSTFIX = new NumberPostfix(1) {
-        @Override
-        public Number convertFrom(int number, String content) {
-            return null;
-        }
-
-        @Override
-        public Number convertFrom(long number, String content) {
-            return null;
-        }
-
         @Override
         public Number convertFromDecimal(String numberString, String content) {
             return Float.parseFloat(numberString);
@@ -79,7 +57,35 @@ public class NumberParser {
         public Number convertFromBigInteger(String numberString, int radix, String content) {
             return Float.parseFloat(numberString);
         }
+    }, DOUBLE_POSTFIX = new NumberPostfix(1) {
+        @Override
+        public Number convertFromDecimal(String numberString, String content) {
+            return Double.parseDouble(numberString);
+        }
+
+        @Override
+        public Number convertFromBigInteger(String numberString, int radix, String content) {
+            return Double.parseDouble(numberString);
+        }
+    }, BIG_DECIMAL_POSTFIX = new NumberPostfix(2) {
+        @Override
+        public Number convertFromDecimal(String numberString, String content) {
+            return new BigDecimal(numberString);
+        }
+
+        @Override
+        public Number convertFromBigInteger(String numberString, int radix, String content) {
+            return new BigDecimal(numberString);
+        }
     };
+
+    private static final NumberPostfix[] INTEGER_POSTFIXES = new NumberPostfix[128];
+
+    static {
+        INTEGER_POSTFIXES['y'] = INTEGER_POSTFIXES['Y'] = BYTE_POSTFIX;
+        INTEGER_POSTFIXES['s'] = INTEGER_POSTFIXES['S'] = SHORT_POSTFIX;
+        INTEGER_POSTFIXES['l'] = INTEGER_POSTFIXES['L'] = LONG_POSTFIX;
+    }
 
     public static abstract class NumberPostfix {
         private final int length;
@@ -88,12 +94,12 @@ public class NumberParser {
             this.length = length;
         }
 
-        public abstract Number convertFrom(int number, String content);
+        public Number convertFrom(int number, String content) {
+            return null;
+        }
 
-        public abstract Number convertFrom(long number, String content);
-
-        public int getLength() {
-            return length;
+        public Number convertFrom(long number, String content) {
+            return null;
         }
 
         public Number convertFromBigInteger(String numberString, int radix, String content) {
@@ -129,39 +135,36 @@ public class NumberParser {
             radix = 16;
         }
 
-        NumberPostfix postfix = null;
-        switch (content.charAt(length - 1)) {
-            case 'y':
-            case 'Y':
-                postfix = BYTE_POSTFIX;
-                break;
-            case 's':
-            case 'S':
-                postfix = SHORT_POSTFIX;
-                break;
-            case 'l':
-            case 'L':
-                postfix = LONG_POSTFIX;
-                break;
-            case 'f':
-            case 'F':
-                if (radix == 10)
-                    return directlyParse(content, length, sign, index, radix, 1, FLOAT_POSTFIX);
-                break;
-            default:
-                if (content.endsWith("bi") || content.endsWith("BI"))
-                    return directlyParse(content, length, sign, index, radix, 2, BIG_INTEGER_POSTFIX);
-                break;
-        }
-        if (postfix != null && index == (length -= postfix.getLength()))
+        char c = content.charAt(length - 1);
+        NumberPostfix postfix = INTEGER_POSTFIXES[c];
+        if (postfix == null) {
+            postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
+            if (postfix != null) {
+                if (index == (length -= postfix.length))
+                    return null;
+                return continueParseBigInteger(radix, index, content, length, postfix, newStringBuilder(length, sign));
+            }
+        } else if (index == (length -= postfix.length))
             return null;
         return parseFromInteger(content, length, sign, index, radix, postfix);
     }
 
-    private Number directlyParse(String content, int length, int sign, int index, int radix, int subLength, NumberPostfix postfix) {
-        if (index == (length -= subLength))
-            return null;
-        return continueParseBigInteger(radix, index, content, length, postfix, newStringBuilder(length, sign));
+    private NumberPostfix fetchDecimalOrBigIntegerPostfix(String content, int radix, char c) {
+        if (content.endsWith("bi") || content.endsWith("BI"))
+            return BIG_INTEGER_POSTFIX;
+        if ((content.endsWith("bd") || content.endsWith("BD")) && radix == 10)
+            return BIG_DECIMAL_POSTFIX;
+        switch (c) {
+            case 'f':
+            case 'F':
+                if (radix == 10)
+                    return FLOAT_POSTFIX;
+            case 'd':
+            case 'D':
+                if (radix == 10)
+                    return DOUBLE_POSTFIX;
+        }
+        return null;
     }
 
     private StringBuilder newStringBuilder(int length, int sign) {
@@ -280,8 +283,8 @@ public class NumberParser {
     private Number continueParseLong(int sign, int radix, long number, int digit, int index,
                                      String content, int length, NumberPostfix postfix) {
         number = number * radix - digit;
-        long limit = sign == 1 ? -Long.MAX_VALUE : Long.MIN_VALUE;
-        long limitBeforeMul = limit / radix;
+        long limitLong = sign == 1 ? -Long.MAX_VALUE : Long.MIN_VALUE;
+        long limitBeforeMulLong = limitLong / radix;
         while (index < length) {
             char c = content.charAt(index++);
             if (c == '_' && index != length)
@@ -294,7 +297,7 @@ public class NumberParser {
                     return parseDoubleWithPower(content, index, length, toStringBuilder(radix, sign, number, length), postfix);
                 return null;
             }
-            if (isOverflow(digit, number, limit, limitBeforeMul, radix))
+            if (isOverflow(digit, number, limitLong, limitBeforeMulLong, radix))
                 return continueParseBigInteger(radix, index, content, length, postfix,
                         toStringBuilder(radix, sign, number, length).append(c));
             number = number * radix - digit;

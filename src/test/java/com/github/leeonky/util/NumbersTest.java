@@ -490,26 +490,26 @@ class NumbersTest {
                 assertParse("-10bi", BigInteger.valueOf(-10));
             }
 
-            //            @Test
-//            void as_big_decimal() {
-//                assertParse("0bd", BigDecimal.valueOf(0));
-//                assertParse("1bd", BigDecimal.valueOf(1));
-//                assertParse("-1bd", BigDecimal.valueOf(-1));
-//            }
-//
+            @Test
+            void as_big_decimal() {
+                assertParse("0bd", BigDecimal.valueOf(0));
+                assertParse("1bd", BigDecimal.valueOf(1));
+                assertParse("-1bd", BigDecimal.valueOf(-1));
+            }
+
             @Test
             void as_float() {
                 assertParse("0f", 0.0f);
                 assertParse("1f", 1.0f);
                 assertParse("-1f", -1.0f);
             }
-//
-//            @Test
-//            void as_double() {
-//                assertParse("0d", 0.0);
-//                assertParse("1d", 1.0);
-//                assertParse("-1d", -1.0);
-//            }
+
+            @Test
+            void as_double() {
+                assertParse("0d", 0.0);
+                assertParse("1d", 1.0);
+                assertParse("-1d", -1.0);
+            }
         }
 
         //
@@ -543,23 +543,23 @@ class NumbersTest {
                 assertParse("-0xffff_ffff_ffbi", new BigInteger("-ffffffffff", 16));
             }
 
-//            @Test
-//            void as_big_decimal() {
-//                assertParse("2147483648bd", BigDecimal.valueOf(2147483648L));
-//                assertParse("-2147483649bd", BigDecimal.valueOf(-2147483649L));
-//            }
-//
-//            @Test
-//            void as_float() {
-//                assertParse("2147483648f", 2147483648f);
-//                assertParse("-2147483648f", -2147483648f);
-//            }
-//
-//            @Test
-//            void as_double() {
-//                assertParse("2147483648d", 2147483648d);
-//                assertParse("-2147483648d", -2147483648d);
-//            }
+            @Test
+            void as_big_decimal() {
+                assertParse("2147483648bd", BigDecimal.valueOf(2147483648L));
+                assertParse("-2147483649bd", BigDecimal.valueOf(-2147483649L));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("2147483648f", 2147483648f);
+                assertParse("-2147483648f", -2147483648f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("2147483648d", 2147483648d);
+                assertParse("-2147483648d", -2147483648d);
+            }
         }
 
 
@@ -590,23 +590,23 @@ class NumbersTest {
                 assertParse("-0x8000_0000_0000_0001bi", new BigInteger("-8000000000000001", 16));
             }
 
-//            @Test
-//            void as_big_decimal() {
-//                assertParse("9223372036854775808bd", new BigDecimal("9223372036854775808"));
-//                assertParse("-9223372036854775809bd", new BigDecimal("-9223372036854775809"));
-//            }
-//
-//            @Test
-//            void as_float() {
-//                assertParse("9223372036854775808f", 9223372036854775808f);
-//                assertParse("-9223372036854775808f", -9223372036854775808f);
-//            }
-//
-//            @Test
-//            void as_double() {
-//                assertParse("9223372036854775808d", 9223372036854775808d);
-//                assertParse("-9223372036854775808d", -9223372036854775808d);
-//            }
+            @Test
+            void as_big_decimal() {
+                assertParse("9223372036854775808bd", new BigDecimal("9223372036854775808"));
+                assertParse("-9223372036854775809bd", new BigDecimal("-9223372036854775809"));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("9223372036854775808f", 9223372036854775808f);
+                assertParse("-9223372036854775808f", -9223372036854775808f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("9223372036854775808d", 9223372036854775808d);
+                assertParse("-9223372036854775808d", -9223372036854775808d);
+            }
         }
 
         //        @Nested
@@ -723,10 +723,10 @@ class NumbersTest {
 //
         @Test
         void invalid_postfix_number() {
+            assertParse("1_d", null);
             assertParse("1_y", null);
             assertParse("1_s", null);
             assertParse("1_L", null);
-            assertParse("1_d", null);
             assertParse("1_f", null);
             assertParse("1_bd", null);
             assertParse("1_bi", null);
