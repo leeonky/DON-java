@@ -610,118 +610,118 @@ class NumbersTest {
             }
         }
 
-        //        @Nested
-//        class DotFloatParser {
-//
-//            @Test
-//            void as_byte() {
-//                assertParseOverflow("0.0y");
-//                assertParseOverflow("2147483648.0y");
-//                assertParseOverflow("9223372036854775808.0y");
-//            }
-//
-//            @Test
-//            void as_short() {
-//                assertParseOverflow("0.0s");
-//                assertParseOverflow("2147483648.0s");
-//                assertParseOverflow("9223372036854775808.0s");
-//            }
-//
-//            @Test
-//            void as_long() {
-//                assertParseOverflow("0.0l");
-//                assertParseOverflow("2147483648.0l");
-//                assertParseOverflow("9223372036854775808.0l");
-//            }
-//
-//            @Test
-//            void as_big_integer() {
-//                assertParseOverflow("0.0bi");
-//                assertParseOverflow("2147483648.0bi");
-//                assertParseOverflow("9223372036854775808.0bi");
-//            }
-//
-//            @Test
-//            void as_big_decimal() {
-//                assertParse("0.0bd", new BigDecimal("0.0"));
-//                assertParse("2147483648.0bd", new BigDecimal("2147483648.0"));
-//                assertParse("9223372036854775808.0bd", new BigDecimal("9223372036854775808.0"));
-//            }
-//
-//            @Test
-//            void as_float() {
-//                assertParse("0.0f", 0.0f);
-//                assertParse("2147483648.0f", 2147483648.0f);
-//                assertParse("9223372036854775808.0f", 9223372036854775808.0f);
-//            }
-//
-//            @Test
-//            void as_double() {
-//                assertParse("0.0d", 0.0d);
-//                assertParse("2147483648.0d", 2147483648.0d);
-//                assertParse("9223372036854775808.0d", 9223372036854775808.0d);
-//            }
-//        }
-//
-//        @Nested
-//        class PowerFloatParser {
-//
-//            @Test
-//            void as_byte() {
-//                assertParseOverflow("0e0y");
-//                assertParseOverflow("2147483648e0y");
-//                assertParseOverflow("9223372036854775808e0y");
-//            }
-//
-//            @Test
-//            void as_short() {
-//                assertParseOverflow("0e0s");
-//                assertParseOverflow("2147483648e0s");
-//                assertParseOverflow("9223372036854775808e0s");
-//            }
-//
-//            @Test
-//            void as_long() {
-//                assertParseOverflow("0e0l");
-//                assertParseOverflow("2147483648e0l");
-//                assertParseOverflow("9223372036854775808e0l");
-//            }
-//
-//            @Test
-//            void as_big_integer() {
-//                assertParseOverflow("0e0bi");
-//                assertParseOverflow("2147483648e0bi");
-//                assertParseOverflow("9223372036854775808e0bi");
-//            }
-//
-//            @Test
-//            void as_big_decimal() {
-//                assertParse("0e0bd", new BigDecimal("0e0"));
-//                assertParse("2147483648e0bd", new BigDecimal("2147483648e0"));
-//                assertParse("9223372036854775808e0bd", new BigDecimal("9223372036854775808e0"));
-//            }
-//
-//            @Test
-//            void as_float() {
-//                assertParse("0e0f", 0e0f);
-//                assertParse("2147483648e0f", 2147483648e0f);
-//                assertParse("9223372036854775808e0f", 9223372036854775808e0f);
-//            }
-//
-//            @Test
-//            void as_double() {
-//                assertParse("0e0d", 0e0d);
-//                assertParse("2147483648e0d", 2147483648e0d);
-//                assertParse("9223372036854775808e0d", 9223372036854775808e0d);
-//            }
-//
-//            @Test
-//            void overflow() {
-//                assertParseOverflow("1E200f");
-//                assertParseOverflow("1E400d");
-//            }
-//        }
-//
+        @Nested
+        class DotFloatParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0.0y");
+                assertParseOverflow("2147483648.0y");
+                assertParseOverflow("9223372036854775808.0y");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0.0s");
+                assertParseOverflow("2147483648.0s");
+                assertParseOverflow("9223372036854775808.0s");
+            }
+
+            @Test
+            void as_long() {
+                assertParseOverflow("0.0l");
+                assertParseOverflow("2147483648.0l");
+                assertParseOverflow("9223372036854775808.0l");
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParseOverflow("0.0bi");
+                assertParseOverflow("2147483648.0bi");
+                assertParseOverflow("9223372036854775808.0bi");
+            }
+
+            @Test
+            void as_big_decimal() {
+                assertParse("0.0bd", new BigDecimal("0.0"));
+                assertParse("2147483648.0bd", new BigDecimal("2147483648.0"));
+                assertParse("9223372036854775808.0bd", new BigDecimal("9223372036854775808.0"));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("0.0f", 0.0f);
+                assertParse("2147483648.0f", 2147483648.0f);
+                assertParse("9223372036854775808.0f", 9223372036854775808.0f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("0.0d", 0.0d);
+                assertParse("2147483648.0d", 2147483648.0d);
+                assertParse("9223372036854775808.0d", 9223372036854775808.0d);
+            }
+        }
+
+        @Nested
+        class PowerFloatParser {
+
+            @Test
+            void as_byte() {
+                assertParseOverflow("0e0y");
+                assertParseOverflow("2147483648e0y");
+                assertParseOverflow("9223372036854775808e0y");
+            }
+
+            @Test
+            void as_short() {
+                assertParseOverflow("0e0s");
+                assertParseOverflow("2147483648e0s");
+                assertParseOverflow("9223372036854775808e0s");
+            }
+
+            @Test
+            void as_long() {
+                assertParseOverflow("0e0l");
+                assertParseOverflow("2147483648e0l");
+                assertParseOverflow("9223372036854775808e0l");
+            }
+
+            @Test
+            void as_big_integer() {
+                assertParseOverflow("0e0bi");
+                assertParseOverflow("2147483648e0bi");
+                assertParseOverflow("9223372036854775808e0bi");
+            }
+
+            @Test
+            void as_big_decimal() {
+                assertParse("0e0bd", new BigDecimal("0e0"));
+                assertParse("2147483648e0bd", new BigDecimal("2147483648e0"));
+                assertParse("9223372036854775808e0bd", new BigDecimal("9223372036854775808e0"));
+            }
+
+            @Test
+            void as_float() {
+                assertParse("0e0f", 0e0f);
+                assertParse("2147483648e0f", 2147483648e0f);
+                assertParse("9223372036854775808e0f", 9223372036854775808e0f);
+            }
+
+            @Test
+            void as_double() {
+                assertParse("0e0d", 0e0d);
+                assertParse("2147483648e0d", 2147483648e0d);
+                assertParse("9223372036854775808e0d", 9223372036854775808e0d);
+            }
+
+            @Test
+            void overflow() {
+                assertParseOverflow("1E200f");
+                assertParseOverflow("1E400d");
+            }
+        }
+
         @Test
         void invalid_postfix_number() {
             assertParse("1_d", null);
@@ -748,4 +748,3 @@ class NumbersTest {
 }
 
 // TODO 0B
-// TODO configurable radix postfix

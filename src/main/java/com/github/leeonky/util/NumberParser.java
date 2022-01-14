@@ -50,22 +50,34 @@ public class NumberParser {
     }, FLOAT_POSTFIX = new NumberPostfix(1) {
         @Override
         public Number convertFromDecimal(String numberString, String content) {
-            return Float.parseFloat(numberString);
+            return verifyInfinite(Float.parseFloat(numberString), content);
+        }
+
+        private Number verifyInfinite(float f, String content) {
+            if (Float.isInfinite(f))
+                throw new NumberOverflowException(content);
+            return f;
         }
 
         @Override
         public Number convertFromBigInteger(String numberString, int radix, String content) {
-            return Float.parseFloat(numberString);
+            return verifyInfinite(Float.parseFloat(numberString), content);
         }
     }, DOUBLE_POSTFIX = new NumberPostfix(1) {
         @Override
         public Number convertFromDecimal(String numberString, String content) {
-            return Double.parseDouble(numberString);
+            return verifyInfinite(Double.parseDouble(numberString), content);
         }
 
         @Override
         public Number convertFromBigInteger(String numberString, int radix, String content) {
-            return Double.parseDouble(numberString);
+            return verifyInfinite(Double.parseDouble(numberString), content);
+        }
+
+        private Number verifyInfinite(double d, String content) {
+            if (Double.isInfinite(d))
+                throw new NumberOverflowException(content);
+            return d;
         }
     }, BIG_DECIMAL_POSTFIX = new NumberPostfix(2) {
         @Override
@@ -126,7 +138,6 @@ public class NumberParser {
                 return null;
             radix = 16;
         }
-
         c = content.charAt(length - 1);
         NumberPostfix postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
         if (postfix != null) {
