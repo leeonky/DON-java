@@ -127,6 +127,32 @@ class NumberParserTest {
                 assertParse("0xG", null);
             }
         }
+
+        @Nested
+        class Radix2 {
+
+            @Test
+            void parse_int_number() {
+                assertParse("0b0", 0);
+                assertParse("0b1", 1);
+                assertParse("0b10", 2);
+            }
+
+            @Test
+            void negative() {
+                assertParse("-0B10", -2);
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("0b", null);
+                assertParse("+0b", null);
+                assertParse("-0b", null);
+                assertParse("0b1_", null);
+                assertParse("0b1b", null);
+                assertParse("0b2", null);
+            }
+        }
     }
 
     @Nested

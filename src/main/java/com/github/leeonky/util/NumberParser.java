@@ -128,6 +128,15 @@ public class NumberParser {
             if ((index += 2) == length)
                 return null;
             radix = 16;
+        } else if (content.startsWith("0b", index) || content.startsWith("0B", index)) {
+            if (index + 2 < length) {
+                char c1 = content.charAt(index + 2);
+                if (c1 == '0' || c1 == '1') {
+                    index += 2;
+                    radix = 2;
+                }
+            } else
+                return null;
         }
         c = content.charAt(length - 1);
         StringNumberPostfix postfix = fetchDecimalOrBigIntegerPostfix(content, radix, c);
