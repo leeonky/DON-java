@@ -136,11 +136,18 @@ class NumberParserTest {
                 assertParse("0b0", 0);
                 assertParse("0b1", 1);
                 assertParse("0b10", 2);
+                assertParse("0b1000_1000", 0x88);
             }
 
             @Test
             void negative() {
                 assertParse("-0B10", -2);
+            }
+
+            @Test
+            void over_flow() {
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000", 0x80000000L);
+                assertParse("-0b1000_0000_0000_0000_0000_0000_0000_0001", -0x80000001L);
             }
 
             @Test
@@ -219,6 +226,28 @@ class NumberParserTest {
                 assertParse("100000000005xx", null);
             }
         }
+
+        @Nested
+        class Radix2 {
+
+            @Test
+            void parse_long() {
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000", 0x800000000L);
+                assertParse("-0b1000_0000_0000_0000_0000_0000_0000_0001_0000", -0x800000010L);
+            }
+
+            @Test
+            void over_flow() {
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000", new BigInteger("9223372036854775808"));
+                assertParse("-0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001", new BigInteger("-9223372036854775809"));
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_", null);
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000b", null);
+            }
+        }
     }
 
     @Nested
@@ -267,6 +296,16 @@ class NumberParserTest {
             void invalid_number() {
                 assertParse("0x10000000000000000005_", null);
                 assertParse("0x10000000000000000005xx", null);
+            }
+        }
+
+        @Nested
+        class Radix2 {
+
+            @Test
+            void parse_big_integer() {
+                assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000", new BigInteger("80000000000000000", 16));
+                assertParse("-0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001_0000", new BigInteger("-80000000000000010", 16));
             }
         }
     }
@@ -775,4 +814,4 @@ class NumberParserTest {
     }
 }
 
-// TODO 0B
+// TODO radix 8
