@@ -124,16 +124,21 @@ public class NumberParser {
             sign = -1;
         }
         int radix = 10;
-        if (index + 2 < length && content.charAt(index) == '0') {
+        if (index + 1 < length && content.charAt(index) == '0') {
             char radixChar = content.charAt(index + 1);
-            if (radixChar == 'x' || radixChar == 'X') {
-                index += 2;
-                radix = 16;
-            } else if (radixChar == 'b' || radixChar == 'B') {
-                char nextChar = content.charAt(index + 2);
-                if (nextChar == '0' || nextChar == '1') {
+            if (isDigit(radixChar) || radixChar == '_') {
+                index++;
+                radix = 8;
+            } else if (index + 2 < length) {
+                if (radixChar == 'x' || radixChar == 'X') {
                     index += 2;
-                    radix = 2;
+                    radix = 16;
+                } else if (radixChar == 'b' || radixChar == 'B') {
+                    char nextChar = content.charAt(index + 2);
+                    if (nextChar == '0' || nextChar == '1') {
+                        index += 2;
+                        radix = 2;
+                    }
                 }
             }
         }

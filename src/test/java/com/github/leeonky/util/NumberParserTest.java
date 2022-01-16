@@ -160,6 +160,46 @@ class NumberParserTest {
                 assertParse("0b2", null);
             }
         }
+
+        @Nested
+        class Radix8 {
+
+            @Test
+            void parse_int_number() {
+                assertParse("00", 0);
+                assertParse("01", 1);
+                assertParse("02", 2);
+                assertParse("03", 3);
+                assertParse("04", 4);
+                assertParse("05", 5);
+                assertParse("06", 6);
+                assertParse("07", 7);
+                assertParse("010", 8);
+                assertParse("0170", 120);
+                assertParse("+0170", 120);
+                assertParse("+0_171", 121);
+                assertParse("0_172", 122);
+            }
+
+            @Test
+            void negative() {
+                assertParse("-0170", -120);
+                assertParse("-0_171", -121);
+                assertParse("-0_172", -122);
+            }
+
+            @Test
+            void over_flow() {
+                assertParse("020000000000", 0x80000000L);
+                assertParse("-020000000001", -0x80000001L);
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("08", null);
+                assertParse("07_", null);
+            }
+        }
     }
 
     @Nested
@@ -248,6 +288,34 @@ class NumberParserTest {
                 assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000b", null);
             }
         }
+
+
+        @Nested
+        class Radix8 {
+
+            @Test
+            void parse_long() {
+                assertParse("0377777777777777", 0xfffffffffffL);
+                assertParse("0377_7777_7777_7777", 0xfff_ffff_ffffL);
+                assertParse("0777777777777777777777", 9223372036854775807L);
+            }
+
+            @Test
+            void negative() {
+                assertParse("-01000000000000000000000", -9223372036854775808L);
+            }
+
+            @Test
+            void over_flow() {
+                assertParse("01000000000000000000000", new BigInteger("9223372036854775808"));
+                assertParse("-01000000000000000000001", new BigInteger("-9223372036854775809"));
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("01000000000000000000_", null);
+            }
+        }
     }
 
     @Nested
@@ -306,6 +374,22 @@ class NumberParserTest {
             void parse_big_integer() {
                 assertParse("0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000", new BigInteger("80000000000000000", 16));
                 assertParse("-0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001_0000", new BigInteger("-80000000000000010", 16));
+            }
+        }
+
+
+        @Nested
+        class Radix8 {
+
+            @Test
+            void parse_big_int() {
+                assertParse("01000000000000000000_0000", new BigInteger("9223372036854775808").multiply(BigInteger.valueOf(8)));
+                assertParse("-01000000000000000000_0010", new BigInteger("-9223372036854775809").multiply(BigInteger.valueOf(8)));
+            }
+
+            @Test
+            void invalid_number() {
+                assertParse("01000000000000000000_0000_", null);
             }
         }
     }
@@ -813,5 +897,3 @@ class NumberParserTest {
             assertThat(new NumberParser().parse(inputCode)).isEqualTo(expected);
     }
 }
-
-// TODO radix 8
