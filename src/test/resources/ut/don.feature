@@ -36,4 +36,4 @@ Feature: support json value: boolean string null number
     Examples:
       | input | type    | result |
       | 1     | Integer | 1      |
-
+      | 1.0   | Double  | 1.0    |

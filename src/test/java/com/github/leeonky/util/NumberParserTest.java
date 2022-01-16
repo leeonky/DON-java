@@ -377,7 +377,6 @@ class NumberParserTest {
             }
         }
 
-
         @Nested
         class Radix8 {
 
